@@ -8,7 +8,7 @@ The dataset used for Data/OK City Station Data/Raw Data can be (and was) obtaine
 6) Click `Quick Add` and `Proceed to Cart`.
 7) Enter Contact information and submit.
 
-After completing these steps you will receive a download link for the csv files you have requested. After downloading the file(s) onto your device, in [cleaning_script.py](<OK City Station Data/Raw Data/cleaning_script.py>) paste the file address into the `filepath` variable. 
+After completing these steps you will receive a download link for the csv files you have requested. After downloading the file(s) onto your device, in [split_data.py](<OK City Station Data/Raw Data/split_data.py>) paste the file address into the `filepath` variable. 
 
 KA1 = Max Temp stuff
 KA2 = Min Temp stuff
