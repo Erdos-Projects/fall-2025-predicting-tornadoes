@@ -1,0 +1,62 @@
+
+The product of the code below can be more succinctly done.
+------------------------------------------------------------------------------------------------------------
+import pandas as pd
+import numpy as np
+import os
+
+# Just for my own exploration :)
+# Analyze which stations have the most data
+# Would have been easier to do this before splitting stations, but alas.
+
+raw_station_data = os.listdir('Data/OK City Station Data/Raw Data') # list files in directory
+
+station_csv_files = [file.replace('.csv','') for file in raw_station_data if ('.csv' in file) and ('Station' in file)] # get csv files
+
+station_list = [] # to hold station numbers as keys and number of csv files as entries
+
+for file in station_csv_files:
+    underscore_split = file.split('_')
+    station_num = underscore_split[1]
+    station_list.append(station_num) # caution station_num is a string
+
+station_n_parts = dict({}) # holds station numbers as keys with values the number of csv files associated to that station.
+
+for station in station_list:
+    i=0 # counter
+    for file in station_csv_files:
+        if station in file:
+            i = i+1
+        else:
+            i=i
+    station_n_parts[station] = i
+    
+
+total_station_dfs = dict({})
+
+for station,n_parts in station_n_parts.items():
+    chunks = []
+    if n_parts == 1:
+        station_csv = f'Data/OK City Station Data/Raw Data/Station_{station}.csv'
+        station_df = pd.read_csv(station_csv)
+        chunks.append(station_df)
+    else:
+        for i in range(1,n_parts):
+            station_csv = f'Data/OK City Station Data/Raw Data/Station_{station}_Part_{i}.csv'
+            station_df = pd.read_csv(station_csv)
+            chunks.append(station_df)
+    df = pd.concat(chunks).copy().reset_index().drop(['index','Unnamed: 0'], axis=1)
+    total_station_dfs[station] = df
+
+Features_dfs =[]
+
+for station, df in total_station_dfs.items():
+        feature_info = {col:[len(df[col].dropna())] for col in df.columns}
+        feature_info_df = pd.DataFrame(feature_info).T
+        feature_info_df.rename(columns={0:f'Station {station}'},inplace =True)
+        Features_dfs.append(feature_info_df)
+        
+    
+Full_Feat_Count = pd.concat(Features_dfs, axis = 1)
+Full_Feat_Count.to_csv("Data/Ok City Station Data/Cleaned Data/PerStationFeatCounts.csv") 
+------------------------------------------------------------------------------------------------------------
