@@ -1,0 +1,1 @@
+There are a number of features that all have nan values in [Features_No_NAN_Counts](<Data/OK City Station Data/Raw Data Observations/Features_No_NAN_Counts.csv>). Let's drop the ones that we don't care about. Here's the ones we do care about:

@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import os
 
-# What this does: Counts the number of non nan's for each feature for each station
+# What this does: Counts the frequency of non nan's for each feature for each station
 # and organizes this information into Features_No_NAN_Counts.csv.
 
 # Note: In the documentation (isd-format-document.pdf) sometimes a number 
@@ -33,10 +33,10 @@ len_record = dict({})
 stations = df['STATION'].unique()
 for station in stations:
     sub_df = df[df['STATION']== station]
-    len_record[station] ={col: len(sub_df[col].dropna()) for col in sub_df.columns}
+    len_record[station] ={col: len(sub_df[col].dropna())/len(sub_df[col]) for col in sub_df.columns}
 
 toconcat = [pd.DataFrame(len_record[station],index = [f'Station {station}']).T for station in stations]
 final_df = pd.concat(toconcat, axis = 1)
-final_name = 'Features_No_NAN_Counts.csv'
+final_name = 'Features_No_NAN_Freq.csv'
 final_path = f'Data/OK City Station Data/Raw Data Observations/{final_name}'
 final_df.to_csv(final_path)
