@@ -90,6 +90,6 @@ new_df2['END_DATE']=new_df2['END_DATE'].apply(lambda r: f'20{r.split('-')[2]}-{r
 final_df = pd.merge(left=new_df,right=new_df2,how ='outer',left_on='YEAR-MONTH-DAY',right_on='BEGIN_DATE')
 
 # double check merge went as desired
-final_df[final_df['YEAR-MONTH-DAY']==final_df['BEGIN_DATE']]
+#final_df[final_df['YEAR-MONTH-DAY']==final_df['BEGIN_DATE']]
 
-(final_df[final_df['YEAR-MONTH-DAY']!=final_df['BEGIN_DATE']]['BEGIN_DATE']).unique()
+#(final_df[final_df['YEAR-MONTH-DAY']!=final_df['BEGIN_DATE']]['BEGIN_DATE']).unique()
