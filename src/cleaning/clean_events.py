@@ -29,7 +29,7 @@ for year in range(2000, 2022):
 # Step 2: Combine the contents df_collect. This yields the DataFrame 
 # consisting of all tornadoes in Oklahoma from 2000-2021
 combined_df = pd.concat(df_collect,axis =0)
-combined_df.to_csv(interim_out_path)
+combined_df.to_csv(interim_out_path,index=False)
 
 # Step 3: Split Date and Time in 'BEGIN_DATE_TIME' and  'END_DATE_TIME' in combined_df. 
 # The entries of these two features are of the form '25-MAY-00 23:55:00' where the date 
@@ -37,10 +37,10 @@ combined_df.to_csv(interim_out_path)
 # END_DATE, END_TIME.
 
 combined_df = combined_df.copy()
-combined_df['BEGIN_DATE'] = combined_df['BEGIN_DATE_TIME'].apply(lambda r : r.split(' ')[0])
-combined_df['BEGIN_TIME'] = combined_df['BEGIN_DATE_TIME'].apply(lambda r : r.split(' ')[1])
-combined_df['END_DATE'] = combined_df['END_DATE_TIME'].apply(lambda r : r.split(' ')[0])
-combined_df['END_TIME'] = combined_df['END_DATE_TIME'].apply(lambda r : r.split(' ')[1])
+combined_df['TORNADO_BEGIN_DATE'] = combined_df['BEGIN_DATE_TIME'].apply(lambda r : r.split(' ')[0])
+combined_df['TORNADO_BEGIN_TIME'] = combined_df['BEGIN_DATE_TIME'].apply(lambda r : r.split(' ')[1])
+combined_df['TORNADO_END_DATE'] = combined_df['END_DATE_TIME'].apply(lambda r : r.split(' ')[0])
+combined_df['TORNADO_END_TIME'] = combined_df['END_DATE_TIME'].apply(lambda r : r.split(' ')[1])
 
 combined_df.drop(['BEGIN_DATE_TIME','END_DATE_TIME'],axis=1,inplace=True) # drop orginals
 
@@ -64,26 +64,38 @@ month_num = {
             }
 
 #Replace month name to a two digit number and get into year-month-day order.
-combined_df['BEGIN_DATE'] = combined_df['BEGIN_DATE'].apply(lambda r: f'{r.split('-')[0]}-{month_num[r.split('-')[1]]}-{r.split('-')[2]}')
-combined_df['END_DATE'] = combined_df['END_DATE'].apply(lambda r: f'{r.split('-')[0]}-{month_num[r.split('-')[1]]}-{r.split('-')[2]}')
+combined_df['TORNADO_BEGIN_DATE'] = combined_df['TORNADO_BEGIN_DATE'].apply(lambda r: f'{r.split('-')[0]}-{month_num[r.split('-')[1]]}-{r.split('-')[2]}')
+combined_df['TORNADO_END_DATE'] = combined_df['TORNADO_END_DATE'].apply(lambda r: f'{r.split('-')[0]}-{month_num[r.split('-')[1]]}-{r.split('-')[2]}')
 
 # Get year to be 20**
-combined_df['BEGIN_DATE']=combined_df['BEGIN_DATE'].apply(lambda r: f'20{r.split('-')[2]}-{r.split('-')[1]}-{r.split('-')[0]}')
-combined_df['END_DATE']=combined_df['END_DATE'].apply(lambda r: f'20{r.split('-')[2]}-{r.split('-')[1]}-{r.split('-')[0]}')
+combined_df['TORNADO_BEGIN_DATE']=combined_df['TORNADO_BEGIN_DATE'].apply(lambda r: f'20{r.split('-')[2]}-{r.split('-')[1]}-{r.split('-')[0]}')
+combined_df['TORNADO_END_DATE']=combined_df['TORNADO_END_DATE'].apply(lambda r: f'20{r.split('-')[2]}-{r.split('-')[1]}-{r.split('-')[0]}')
 
 # Really only care about the following features, so we will drop the others.
 combined_df = combined_df[
         [
-        'BEGIN_DATE_TIME', 
-        'END_DATE_TIME', 
+        'TORNADO_BEGIN_DATE',
+        'TORNADO_BEGIN_TIME',
+        'TORNADO_END_DATE',
+        'TORNADO_END_TIME',
         'BEGIN_LAT', 
-        'END_LAT', 
-        'BEGIN_LON', 
+        'BEGIN_LON',
+        'END_LAT',  
         'END_LON'
         ]
         ]
 
-combined_df.to_csv(processed_out_path)
+# Rename '***_LAT' and '***_LON'
+
+rename_columns={'BEGIN_LAT':'TORNADO_BEGIN_LAT',
+                'END_LAT':'TORNADO_END_LAT',
+                'BEGIN_LON':'TORNADO_BEGIN_LON',
+                'END_LON':'TORNADO_END_LON',
+                }
+
+combined_df.rename(columns=rename_columns, inplace=True)
+
+combined_df.to_csv(processed_out_path,index=False)
 
 # Important Note: Not all tornadoes in this final DataFrame will be used.
 # In EDA and Modeling we allow for a hyperparameter that filters the
