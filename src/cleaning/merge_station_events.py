@@ -10,6 +10,21 @@ def merge_station_events(
     mapping: dict = None,
     drop_originals:bool =False,
     tuple_sep:str =None):
+    f"""
+    Cleans the raw station Pandas DataFrames and combines them into a new DataFrame.
+    Args:
+    event_file_path: str - local GitHub path to the processed Oklahoma Tornadoes.
+    station_raw_dir : str - local GitHub directory containing the raw station data.
+    drop_cols: list[str] or None - list of columns to be dropped in the merged DataFrame.
+    mapping : dict — key = column name, value = list of new sub‐column names. This dictionary
+    represents the columns in the merged data frame that are to be split into new sub-columns
+    as dictated in the associated dictionary value.
+    drop_original : bool — if True, drop the original columns given by the keys of {mapping} 
+    after performing the splitting of the column.
+    tuple_sep : str or None — if the tuple is stored as a string with a separator, provide the separator (e.g., ",").
+    Returns:
+    A new pandas DataFrame with the expanded columns.
+    """
     
     # read in station data
     station_df= clean_station_data(station_raw_dir, 

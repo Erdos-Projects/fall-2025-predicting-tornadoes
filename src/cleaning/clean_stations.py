@@ -16,12 +16,15 @@ def split_tuple_features(df: pd.DataFrame,
                         mapping: dict = None,
                         drop_originals:bool =False,
                         tuple_sep:str =None) -> pd.DataFrame:
-    """
+    f"""
     Splits specified tuple‐columns into separate descriptive columns.
     Args:
-    df : pandas.DataFrame — your data.
-    mapping : dict — key = column name, value = list of new sub‐column names.
-    drop_original : bool — if True, drop the original tuple column after splitting.
+    df : pandas.DataFrame — your dataframe.
+    mapping : dict — key = column name, value = list of new sub‐column names. This dictionary
+    represents the columns in the merged data frame that are to be split into new sub-columns
+    as dictated in the associated dictionary value.
+    drop_original : bool —if True, drop the original columns given by the keys of {mapping} 
+    after performing the splitting of the column.
     tuple_sep : str or None — if the tuple is stored as a string with a separator, provide the separator (e.g., ",").
     
     Returns:
@@ -62,6 +65,20 @@ def clean_station_data(
     drop_originals:bool =False,
     tuple_sep:str =None
 ):
+    f"""
+    Cleans the raw station Pandas DataFrames and combines them into a new DataFrame.
+    Args:
+    raw_dir : str - local GitHub directory containing the raw station data.
+    drop_cols: list[str] or None - list of columns to be dropped in the merged DataFrame.
+    mapping : dict — key = column name, value = list of new sub‐column names. This dictionary
+    represents the columns in the merged data frame that are to be split into new sub-columns
+    as dictated in the associated dictionary value.
+    drop_original : bool — if True, drop the original columns given by the keys of {mapping} 
+    after performing the splitting of the column.
+    tuple_sep : str or None — if the tuple is stored as a string with a separator, provide the separator (e.g., ",").
+    Returns:
+    A new pandas DataFrame with the expanded columns.
+    """
     # Step 1: Read in each station csv and concatenate all.
 
 
@@ -91,8 +108,6 @@ def clean_station_data(
     
     merged.rename(columns= rename, inplace= True)
     
-
-    
     # Step 4 Drop unnecessary columns
     
     if drop_cols is None:
@@ -107,8 +122,6 @@ def clean_station_data(
     
     else: 
         merged = split_tuple_features(merged, mapping, drop_originals, tuple_sep)
-
-    
     
     return merged
 

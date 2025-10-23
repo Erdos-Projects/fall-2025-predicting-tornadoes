@@ -15,6 +15,18 @@ from src.cleaning.merge_station_events import merge_station_events
 # Haversine Formula for computing the number of kilometers between 
 # To use this must convert lat lon from degrees to radians.
 def lat_lon_metric(lat_lon_1:tuple[float,float],lat_lon_2:tuple[float,float]):
+    f""" Calculates the great circle distance between two points on Earth given
+    their latitude and longitude.
+
+    Args:
+        lat_lon_1 : tuple[float,float] - a latitude,longitude coordinate. Both entries
+        are in degrees.
+        lat_lon_2 : tuple[float,float] - a latitude,longitude coordinate. Both entries
+        are in degrees.
+
+    Returns:
+        float -  the great circle distance between {lat_lon_1} and {lat_lon_2} in kilometers.
+    """
     Rd = 6371 # approx. Earth radius in km
     lat_1,lon_1 = lat_lon_1[0],lat_lon_1[1] # in deg
     lat_2,lon_2 = lat_lon_2[0],lat_lon_2[1] # in deg
@@ -30,6 +42,20 @@ def lat_lon_metric(lat_lon_1:tuple[float,float],lat_lon_2:tuple[float,float]):
     return D
 
 def within_radius(lat_lon_1:tuple[float,float],lat_lon_2:tuple[float,float], valid_radius :float):
+    f""" Determines if the great circle distance between two points on Earth, given 
+    their latitude and longitude, are within a set distance from each other.
+
+    Args:
+        lat_lon_1 : tuple[float,float]- a latitude,longitude coordinate. Both entries
+        are in degrees.
+        lat_lon_2 : tuple[float,float]- a latitude,longitude coordinate. Both entries
+        are in degrees.
+        valid_radius : float - a positive float.
+
+    Returns:
+        boolean - True if {lat_lon_1} and {lat_lon_2} are withing f{valid_radius} kilometers
+        from each other, false otherwise.
+    """
     if np.isnan(lat_lon_1[0]):
         return np.nan
     elif np.isnan(lat_lon_1[1]):
@@ -46,19 +72,6 @@ def within_radius(lat_lon_1:tuple[float,float],lat_lon_2:tuple[float,float], val
         else:
             return False
     
-    
-# Tornado starting distance from station
-def initial_tornado_to_station_distance(pd_row):
-    station_lat_lon = pd_row['STATION_LAT'],pd_row['STATION_LON']
-    initial_tornado_lat_lon = pd_row['TORNADO_BEGIN_LAT'],pd_row['TORNADO_BEGIN_LON']
-    return lat_lon_metric(station_lat_lon,initial_tornado_lat_lon)
-# Checks if lat,lon of station and beginning position of tornado are within valid radius
-def apply_valid_radius(pd_row,valid_radius : float):
-    station_lat_lon = pd_row['STATION_LAT'],pd_row['STATION_LON']
-    initial_tornado_lat_lon = pd_row['TORNADO_BEGIN_LAT'],pd_row['TORNADO_BEGIN_LON']
-    return within_radius(station_lat_lon, initial_tornado_lat_lon,valid_radius)
-
-
 
 ### HYPERPARAMETER time_window in hours
 ### if a tornado happens at 16:00 and time_window is 1,
@@ -72,6 +85,7 @@ def apply_valid_radius(pd_row,valid_radius : float):
 # between the starting and end lat,lon of a tornado.
 ### If this line crosses a valid radius of a station, 
 ### it will be counted. This ASSUMES TORNADO TAKES STRAIGHT LINE.
+
 def create_tornado_indicator(
     event_file_path:str = 'Data/events/processed/final_Oklahoma_Tornadoes_2000_2021.csv',
     station_raw_dir:str='Data/stations/raw',
@@ -82,6 +96,31 @@ def create_tornado_indicator(
     tuple_sep:str =None,
     time_window:float = 1,
     val_radius = 50):
+    f""" Creates a tornado indicator column in the station-events merged DataFrame.
+
+    Args:
+        event_file_path: str - local GitHub path to the processed Oklahoma Tornadoes.
+        station_raw_dir : str - local GitHub directory containing the raw station data.
+        drop_cols: list[str] or None - list of columns to be dropped in the merged DataFrame.
+        mapping : dict — key = column name, value = list of new sub‐column names. This dictionary
+        represents the columns in the merged data frame that are to be split into new sub-columns
+        as dictated in the associated dictionary value.
+        drop_original : bool — if True, drop the original columns given by the keys of {mapping} 
+        after performing the splitting of the column.
+        tuple_sep : str or None — if the tuple is stored as a string with a separator, 
+        provide the separator (e.g., ",").
+        time_window : float - a positive float
+        val_radius : float - a positive float.
+
+    Returns:
+        pd.DataFrame : creates a station-events 
+        merged DataFrame, where columns from {drop_cols} are dropped, if {split_tuples} is True
+        columns are split into sub-columns as dictated by {mapping} and {tuple_sep}, and creates a
+        new column new column 'TORNADO_OCCURRENCE' consisting of boolean values. A sample has an entry
+        of True in 'TORNADO_OCCURRENCE' if the station in the sample observes a Tornado within 
+        {time_window} hours of the tornado's beginning time and the station is within {val_radius}
+        kilometers of the tornado's STARTING position.
+    """
     # Note that time_window and val_radius are in hours and km respectively.
 
     data = merge_station_events(event_file_path,
@@ -91,6 +130,19 @@ def create_tornado_indicator(
                         mapping,
                         drop_originals,
                         tuple_sep)
+    
+    # Tornado starting distance from station
+    def initial_tornado_to_station_distance(pd_row):
+        station_lat_lon = pd_row['STATION_LAT'],pd_row['STATION_LON']
+        initial_tornado_lat_lon = pd_row['TORNADO_BEGIN_LAT'],pd_row['TORNADO_BEGIN_LON']
+        return lat_lon_metric(station_lat_lon,initial_tornado_lat_lon)
+    
+# Checks if lat,lon of station and beginning position of tornado are within valid radius
+    def apply_valid_radius(pd_row,valid_radius : float):
+        station_lat_lon = pd_row['STATION_LAT'],pd_row['STATION_LON']
+        initial_tornado_lat_lon = pd_row['TORNADO_BEGIN_LAT'],pd_row['TORNADO_BEGIN_LON']
+        return within_radius(station_lat_lon, initial_tornado_lat_lon,valid_radius) 
+    
     data['TORNADO_INITIAL_DISTANCE_FROM_STATION'] = data.apply(lambda r : initial_tornado_to_station_distance(r),axis =1)
     data[f'TORNADO_INITIAL_DISTANCE_FROM_STATION_WITHIN_{val_radius}_km'] = data.apply(lambda r: apply_valid_radius(r,val_radius),axis =1)
     # Used for enforcing time window 
