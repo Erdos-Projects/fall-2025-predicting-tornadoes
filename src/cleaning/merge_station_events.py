@@ -27,12 +27,13 @@ def merge_station_events(
     """
     
     # read in station data
-    station_df= clean_station_data(station_raw_dir, 
-                                drop_cols,
-                                split_tuples,
-                                mapping,
-                                drop_originals,
-                                tuple_sep)
+    station_df= clean_station_data(raw_dir=station_raw_dir, 
+                                drop_cols=drop_cols,
+                                split_tuples=split_tuples,
+                                mapping = mapping,
+                                drop_originals=drop_originals,
+                                tuple_sep= tuple_sep,
+                                )
     
     # read in event data
 

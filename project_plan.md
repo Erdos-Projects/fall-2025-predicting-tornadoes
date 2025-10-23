@@ -1,9 +1,8 @@
-EDA Checklist
+# EDA Checklist
 
 
 ## **1. Data Access and Setup**
 - [ ] Import cleaned data from the **processed** folder (not raw or interim).
-- [ ] Check file paths and confirm shapes match expectations.
 - [ ] Display a small sample (`df.head()`, `df.sample(5)`).
 - [ ] Note any missing or unexpected columns.
 

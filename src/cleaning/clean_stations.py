@@ -119,7 +119,10 @@ def clean_station_data(
     
     if not split_tuples:
         pass
-    
+    elif mapping is None:
+        pass
+    elif tuple_sep is None:
+        pass
     else: 
         merged = split_tuple_features(merged, mapping, drop_originals, tuple_sep)
     
