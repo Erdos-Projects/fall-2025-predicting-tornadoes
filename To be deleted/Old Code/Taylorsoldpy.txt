@@ -277,3 +277,30 @@ mapping = {
        'WND- Wind Observation- Speed Rate',
        'WND- Wind Observation- Speed Quality Code'],
 }
+
+
+
+
+
+
+  data['TORNADO_INITIAL_DISTANCE_FROM_STATION'] = data.apply(lambda r : initial_tornado_to_station_distance(r),axis =1)
+    data[f'TORNADO_INITIAL_DISTANCE_FROM_STATION_WITHIN_{val_radius}_km'] = data.apply(lambda r: apply_valid_radius(r,val_radius),axis =1)
+    # Used for enforcing time window 
+    def apply_time_window(pd_row, time_window,valid_radius):
+        tornado_begin_date_time = pd_row['TORNADO_BEGIN_DATE_TIME']
+        station_date_time = pd_row['STATION_DATE_TIME']
+        within_radius_boolean = pd_row[f'TORNADO_INITIAL_DISTANCE_FROM_STATION_WITHIN_{valid_radius}_km']
+        # type check below because np.nan is a float in this column
+        if pd.isna(tornado_begin_date_time) or pd.isna(station_date_time):
+            return np.nan
+        if not within_radius_boolean:
+            return False
+        # All times are in HOUR:MIN:SECONDS 
+        # Capture HOURs
+        date_time_displacement = tornado_begin_date_time - station_date_time 
+        
+        if np.abs(date_time_displacement.total_seconds())<= 3600*time_window:
+            return True
+        else:
+            return False
+    

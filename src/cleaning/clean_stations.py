@@ -91,19 +91,20 @@ def clean_station_data(
     merged = stations_df.reset_index().drop(['index', 'Unnamed: 0'], axis =1).copy() 
 
     # Step 2: Values in the 'DATE' feature are of the form 2000-01-01T00:00:00. 
-    # Split these into 'YEAR-MONTH-DAY' and 'TIME' features for each DataFrame
-    # in station_dfs.
+    # We put this into datetime64[ns] form.
 
 
-    merged['YEAR-MONTH-DAY'] = merged['DATE'].apply(lambda r: r.split('T')[0])
-    merged['TIME'] = merged['DATE'].apply(lambda r: r.split('T')[1])
+
+    merged['STATION_DATE_TIME'] = merged['DATE'].apply(lambda r: f"{r.split('T')[0]} {r.split('T')[1]}")
+    merged['STATION_DATE_TIME'] = pd.to_datetime(merged['STATION_DATE_TIME'], errors= 'coerce')
+    
+    
     merged.drop(['DATE'],axis=1,inplace=True)
     
     # Step 3: A column name change
     rename = {
             'LATITUDE' : 'STATION_LAT',
             'LONGITUDE' : 'STATION_LON',
-            'TIME': 'STATION_TIME'
         }
     
     merged.rename(columns= rename, inplace= True)

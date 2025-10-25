@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import datetime
 import math
 from src.cleaning.merge_station_events import merge_station_events
 # Create Tornado indicator column
@@ -145,26 +146,45 @@ def create_tornado_indicator(
     
     data['TORNADO_INITIAL_DISTANCE_FROM_STATION'] = data.apply(lambda r : initial_tornado_to_station_distance(r),axis =1)
     data[f'TORNADO_INITIAL_DISTANCE_FROM_STATION_WITHIN_{val_radius}_km'] = data.apply(lambda r: apply_valid_radius(r,val_radius),axis =1)
-    # Used for enforcing time window 
-    def apply_time_window(pd_row, time_window,valid_radius):
-        tornado_begin_time = pd_row['TORNADO_BEGIN_TIME']
-        station_time = pd_row['STATION_TIME']
-        within_radius_boolean = pd_row[f'TORNADO_INITIAL_DISTANCE_FROM_STATION_WITHIN_{valid_radius}_km']
-        # type check below because np.nan is a float in this column
-        if type(tornado_begin_time) is float and np.isnan(tornado_begin_time):
-            return np.nan
-        if not within_radius_boolean:
-            return False
-        # All times are in HOUR:MIN:SECONDS 
-        # Capture HOURs
-        tornado_hour = int(tornado_begin_time.split(":")[0])
-        station_hour = int(station_time.split(":")[0])
-        if np.abs(station_hour - tornado_hour)<= time_window:
-            return True
-        else:
-            return False
+
+# Ensures  datetime64[ns] type
+    data['TORNADO_BEGIN_DATE_TIME'] = pd.to_datetime(
+        data['TORNADO_BEGIN_DATE_TIME'], errors="coerce"
+    )
+    data['STATION_DATE_TIME'] = pd.to_datetime(
+        data['STATION_DATE_TIME'], errors="coerce"
+    )
+    data['TORNADO_END_DATE_TIME'] = pd.to_datetime(
+        data['TORNADO_END_DATE_TIME'], errors="coerce"
+    )
+# Mask for identifying tornado occurrence per station and station datetime
+    mask = (
+    (data[f'TORNADO_INITIAL_DISTANCE_FROM_STATION_WITHIN_{val_radius}_km']) &
+    (data['TORNADO_BEGIN_DATE_TIME'].notna()) &
+    (data['STATION_DATE_TIME'].notna())
+    )   
+
+    time_diff = data['TORNADO_BEGIN_DATE_TIME'] - data.loc[mask, 'STATION_DATE_TIME']
+    # ensure result is actually a timedelta series
+    if not np.issubdtype(time_diff.dtype, np.timedelta64):
+        raise TypeError(f"time_diff dtype is {time_diff.dtype}, expected timedelta64[ns]")
     
     
+    data.loc[mask, 'TORNADO_OCCURRENCE'] = ((time_diff.abs().dt.total_seconds()) <= (3600*time_window))
     
-    data['TORNADO_OCCURRENCE'] = data.apply(lambda r : apply_time_window(r, time_window,val_radius), axis = 1)
+    
+    data["TORNADO_OCCURRENCE"].fillna(False, inplace = True)
+
+
     return data
+
+
+# ensure result is actually a timedelta series
+    if not np.issubdtype(time_diff.dtype, np.timedelta64):
+        raise TypeError(f"time_diff dtype is {time_diff.dtype}, expected timedelta64[ns]")
+    
+    
+    data.loc[mask, 'TORNADO_OCCURRENCE'] = ((time_diff.abs().dt.total_seconds()) <= (3600*time_window))
+    
+    
+    data["TORNADO_OCCURRENCE"].fillna(False, inplace = True)

@@ -1,0 +1,44 @@
+,0
+STATION,0
+STATION_LAT,0
+STATION_LON,0
+ELEVATION,0
+STATION_DATE_TIME,0
+CIG- Sky Condition Observation- Ceiling Height Dimension,151195
+CIG- Sky Condition Observation- Ceiling Quality Code,5144
+CIG- Sky Condition Observation- Ceiling Determination Code,1112575
+CIG- Sky Condition Observation- Cavok Code,111703
+DEW- Air Temperature Observation- Dew Point Temperature,125054
+DEW- Air Temperature Observation- Dew Point Quality Code,17718
+GA1- Sky Cover Layer- Coverage Code,735901
+GA1- Sky Cover Layer- Coverage Quality Code,716775
+GA1- Sky Cover Layer- Base Height Dimensions,992332
+GA1- Sky Cover Layer- Base Height Quality Code,715678
+GA1- Sky Cover Layer- Cloud Type Code,1604605
+GA1- Sky Cover Layer- Cloud Type Quality Code,715417
+MA1-Atmospheric Pressure Observation- Altimeter Setting Rate,173891
+MA1-Atmospheric Pressure Observation- Altimeter Quality Code,116318
+MA1-Atmospheric Pressure Observation- Station Pressure Rate,466970
+MA1-Atmospheric Pressure Observation- Station Pressure Quality Code,116318
+SLP- Atmospheric Pressure Observation- Sea Level Pressure,841300
+SLP- Atmospheric Pressure Observation- Sea Level Pressure Quality Code,0
+TMP- Air Temperature Observation- Air Temperature,117074
+TMP- Air Temperature Observation- Air Temperature Quality Code,17720
+VIS- Visibility Observation- Distance Dimension,117971
+VIS- Visibility Observation- Distance Quality Code,1779
+VIS- Visibility Observation- Variability Code,154051
+VIS- Visibility Observation- Quality Variability Code,0
+WND- Wind Observation- Direction Angle,205681
+WND- Wind Observation- Direction Quality Code,0
+WND- Wind Observation- Type Code,0
+WND- Wind Observation- Speed Rate,117977
+WND- Wind Observation- Speed Quality Code,0
+TORNADO_BEGIN_DATE_TIME,1304305
+TORNADO_END_DATE_TIME,1304305
+TORNADO_BEGIN_LAT,1305477
+TORNADO_BEGIN_LON,1305477
+TORNADO_END_LAT,1305477
+TORNADO_END_LON,1305477
+TORNADO_INITIAL_DISTANCE_FROM_STATION,1305477
+TORNADO_INITIAL_DISTANCE_FROM_STATION_WITHIN_50_km,1305477
+TORNADO_OCCURRENCE,0

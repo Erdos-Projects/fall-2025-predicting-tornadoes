@@ -35,20 +35,10 @@ combined_df.to_csv(interim_out_path,index=False)
 
 # Step 3: Split Date and Time in 'BEGIN_DATE_TIME' and  'END_DATE_TIME' in combined_df. 
 # The entries of these two features are of the form '25-MAY-00 23:55:00' where the date 
-# is in day-month-year format. We split this information into TORNADO_BEGIN_DATE, TORNADO_BEGIN_TIME,
-# TORNADO_END_DATE, TORNADO_END_TIME.
-
+# is in day-month-year format. But format of 'BEGIN_DATE_TIME' and 'END_DATE_TIME' to 
+# 'year-month-day' format. Here year needs to be a 4 digit number, month a two digit number,
+# and day a two digit number. This is for us to be able to put them into datetime64[ns] data types
 combined_df = combined_df.copy()
-combined_df['TORNADO_BEGIN_DATE'] = combined_df['BEGIN_DATE_TIME'].apply(lambda r : r.split(' ')[0]) 
-combined_df['TORNADO_BEGIN_TIME'] = combined_df['BEGIN_DATE_TIME'].apply(lambda r : r.split(' ')[1])
-combined_df['TORNADO_END_DATE'] = combined_df['END_DATE_TIME'].apply(lambda r : r.split(' ')[0])
-combined_df['TORNADO_END_TIME'] = combined_df['END_DATE_TIME'].apply(lambda r : r.split(' ')[1])
-
-combined_df.drop(['BEGIN_DATE_TIME','END_DATE_TIME'],axis=1,inplace=True) # drop originals
-
-# Step 4 Change format of 'BEGIN_DATE' and 'END_DATE' to 'year-month-day' format. Here year needs 
-# to be a 4 digit number, month a two digit number, and day a two digit number. This is so we can
-# merge with station data. 
 
 month_num = {
             'JAN':'01',
@@ -65,37 +55,48 @@ month_num = {
             'DEC':'12'
             }
 
-#Replace month name to a two digit number and get into year-month-day order.
-combined_df['TORNADO_BEGIN_DATE'] = combined_df['TORNADO_BEGIN_DATE'].apply(lambda r: f'{r.split('-')[0]}-{month_num[r.split('-')[1]]}-{r.split('-')[2]}')
-combined_df['TORNADO_END_DATE'] = combined_df['TORNADO_END_DATE'].apply(lambda r: f'{r.split('-')[0]}-{month_num[r.split('-')[1]]}-{r.split('-')[2]}')
+# Replace month name to a two digit number and get into year-month-day order.
+# The following function helps with this
+def event_date_time(pd_row):
+    date_time_str = pd_row
+    date_str = date_time_str.split(' ')[0]
+    time_str = date_time_str.split(' ')[1]
+    date_str_split = date_str.split('-')
+    new_date_str = f"20{date_str_split[2]}-{month_num[date_str_split[1]]}-{date_str_split[0]}" # Need to get into 20** year/ correct order/ month number
+    new_date_time_str = f"{new_date_str} {time_str}"
+    return new_date_time_str
 
-# Get year to be 20**
-combined_df['TORNADO_BEGIN_DATE']=combined_df['TORNADO_BEGIN_DATE'].apply(lambda r: f'20{r.split('-')[2]}-{r.split('-')[1]}-{r.split('-')[0]}')
-combined_df['TORNADO_END_DATE']=combined_df['TORNADO_END_DATE'].apply(lambda r: f'20{r.split('-')[2]}-{r.split('-')[1]}-{r.split('-')[0]}')
 
-# Really only care about the following features, so we will drop the others.
-combined_df = combined_df[
-        [
-        'TORNADO_BEGIN_DATE',
-        'TORNADO_BEGIN_TIME',
-        'TORNADO_END_DATE',
-        'TORNADO_END_TIME',
-        'BEGIN_LAT', 
-        'BEGIN_LON',
-        'END_LAT',  
-        'END_LON'
-        ]
-        ]
+combined_df['BEGIN_DATE_TIME'] = combined_df['BEGIN_DATE_TIME'].apply(lambda r : event_date_time(r))
+combined_df['END_DATE_TIME'] = combined_df['END_DATE_TIME'].apply(lambda r : event_date_time(r))
 
-# Rename '***_LAT' and '***_LON' 
+# Convert to datetime64[ns] 
 
-rename_columns={'BEGIN_LAT':'TORNADO_BEGIN_LAT',
+combined_df['BEGIN_DATE_TIME'] = pd.to_datetime(combined_df['BEGIN_DATE_TIME'],errors='coerce')
+combined_df['END_DATE_TIME'] = pd.to_datetime(combined_df['END_DATE_TIME'],errors='coerce')
+# Rename columns
+
+rename_columns={'BEGIN_DATE_TIME': 'TORNADO_BEGIN_DATE_TIME',
+                'END_DATE_TIME': 'TORNADO_END_DATE_TIME',
+                'BEGIN_LAT':'TORNADO_BEGIN_LAT',
                 'END_LAT':'TORNADO_END_LAT',
                 'BEGIN_LON':'TORNADO_BEGIN_LON',
                 'END_LON':'TORNADO_END_LON',
                 }
-
 combined_df.rename(columns=rename_columns, inplace=True)
+# Really only care about the following features, so we will drop the others.
+combined_df = combined_df[
+        [
+        'TORNADO_BEGIN_DATE_TIME',
+        'TORNADO_END_DATE_TIME',
+        'TORNADO_BEGIN_LAT', 
+        'TORNADO_BEGIN_LON',
+        'TORNADO_END_LAT',  
+        'TORNADO_END_LON'
+        ]
+        ]
+
+
 
 combined_df.to_csv(processed_out_path,index=False)
 

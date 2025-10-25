@@ -38,10 +38,17 @@ def merge_station_events(
     # read in event data
 
     event_df = pd.read_csv(event_file_path)
+    station_df['STATION_DATE_TIME'] = pd.to_datetime(station_df['STATION_DATE_TIME'], errors='coerce')
+    event_df['TORNADO_BEGIN_DATE_TIME'] = pd.to_datetime(event_df['TORNADO_BEGIN_DATE_TIME'], errors='coerce')
     
-    # Merge Event and Station Data
-    data = pd.merge(left=station_df,right=event_df,how ='outer',left_on='YEAR-MONTH-DAY',right_on='TORNADO_BEGIN_DATE')
+    # DOESN'T ACCOUNT FOR NEXT DAY TORNADOES-- OKAY WITH THIS
+    station_df['DATE']= station_df['STATION_DATE_TIME'].dt.date
+    event_df['DATE']= event_df['TORNADO_BEGIN_DATE_TIME'].dt.date
+    data = pd.merge(left=station_df,right=event_df,how ='outer',left_on='DATE',right_on='DATE')
     
+    # Drop 'DATE' col
+    
+    data.drop(columns=['DATE'],inplace= True)
     # Convert to floats when possible
     for col in data.columns:
         try:
