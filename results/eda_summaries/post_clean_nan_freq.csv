@@ -4,41 +4,22 @@ STATION_LAT,0.0
 STATION_LON,0.0
 ELEVATION,0.0
 STATION_DATE_TIME,0.0
-CIG- Sky Condition Observation- Ceiling Height Dimension,0.09301880616995935
-CIG- Sky Condition Observation- Ceiling Quality Code,0.0031647127149592967
-CIG- Sky Condition Observation- Ceiling Determination Code,0.684482941066454
-CIG- Sky Condition Observation- Cavok Code,0.06872237643839392
-DEW- Air Temperature Observation- Dew Point Temperature,0.07693623325360029
-DEW- Air Temperature Observation- Dew Point Quality Code,0.010900540412839973
-GA1- Sky Cover Layer- Coverage Code,0.45274402248274914
-GA1- Sky Cover Layer- Coverage Quality Code,0.4409772465522842
-GA1- Sky Cover Layer- Base Height Dimensions,0.6105065509061021
-GA1- Sky Cover Layer- Base Height Quality Code,0.44030234572640736
-GA1- Sky Cover Layer- Cloud Type Code,0.9871916496864818
-GA1- Sky Cover Layer- Cloud Type Quality Code,0.4401417722391204
-MA1-Atmospheric Pressure Observation- Altimeter Setting Rate,0.10698193209894773
-MA1-Atmospheric Pressure Observation- Altimeter Quality Code,0.07156163561015465
-MA1-Atmospheric Pressure Observation- Station Pressure Rate,0.287291192944118
-MA1-Atmospheric Pressure Observation- Station Pressure Quality Code,0.07156163561015465
-SLP- Atmospheric Pressure Observation- Sea Level Pressure,0.517588026262686
-SLP- Atmospheric Pressure Observation- Sea Level Pressure Quality Code,0.0
-TMP- Air Temperature Observation- Air Temperature,0.07202674502160666
-TMP- Air Temperature Observation- Air Temperature Quality Code,0.010901770861018418
-VIS- Visibility Observation- Distance Dimension,0.07257860102963903
-VIS- Visibility Observation- Distance Quality Code,0.0010944836547263975
-VIS- Visibility Observation- Variability Code,0.09477588616877812
-VIS- Visibility Observation- Quality Variability Code,0.0
-WND- Wind Observation- Direction Angle,0.12653990589532332
-WND- Wind Observation- Direction Quality Code,0.0
+CIG- Sky Condition Observation- Ceiling Height Dimension,0.0
+DEW- Air Temperature Observation- Dew Point Temperature,0.0
+MA1- Atmospheric Pressure Observation- Altimeter Setting Rate,0.0
+MA1- Atmospheric Pressure Observation- Station Pressure Rate,0.0
+SLP- Atmospheric Pressure Observation- Sea Level Pressure,0.0
+TMP- Air Temperature Observation- Air Temperature,0.0
+VIS- Visibility Observation- Distance Dimension,0.0
+WND- Wind Observation- Direction Angle,0.03978744241720773
 WND- Wind Observation- Type Code,0.0
-WND- Wind Observation- Speed Rate,0.07258229237417436
-WND- Wind Observation- Speed Quality Code,0.0
-TORNADO_BEGIN_DATE_TIME,0.8024398556930377
-TORNADO_END_DATE_TIME,0.8024398556930377
-TORNADO_BEGIN_LAT,0.8031608983256061
-TORNADO_BEGIN_LON,0.8031608983256061
-TORNADO_END_LAT,0.8031608983256061
-TORNADO_END_LON,0.8031608983256061
-TORNADO_INITIAL_DISTANCE_FROM_STATION,0.8031608983256061
-TORNADO_INITIAL_DISTANCE_FROM_STATION_WITHIN_50_km,0.8031608983256061
+WND- Wind Observation- Speed Rate,0.0
+TORNADO_BEGIN_DATE_TIME,0.7996209510682288
+TORNADO_END_DATE_TIME,0.7996209510682288
+TORNADO_BEGIN_LAT,0.7996572236932786
+TORNADO_BEGIN_LON,0.7996572236932786
+TORNADO_END_LAT,0.7996572236932786
+TORNADO_END_LON,0.7996572236932786
+TORNADO_INITIAL_DISTANCE_FROM_STATION,0.7996572236932786
+TORNADO_INITIAL_DISTANCE_FROM_STATION_WITHIN_50_km,0.7996572236932786
 TORNADO_OCCURRENCE,0.0

@@ -304,3 +304,23 @@ mapping = {
         else:
             return False
     
+
+    # `WND- Wind Observation- Direction Angle` is np.nan and 
+# `WND- Wind Observation- Type Code` is V.
+
+# masks
+direction_angle_cond = data['WND- Wind Observation- Direction Angle'].isna()  
+type_code_V = data['WND- Wind Observation- Type Code'] == 'V'
+# find index subset for which conditions hold
+var_wind_index = data[(direction_angle_cond)&(type_code_V)].index # find index for which conditions hold
+
+data.loc[var_wind_index,['WND- Wind Observation- Direction Angle']] = -1 # change to -1
+
+# Make sure values were changed
+# Recompute conditions
+direction_angle_cond = data['WND- Wind Observation- Direction Angle'].isna()  
+type_code_V = data['WND- Wind Observation- Type Code'] == 'V'
+
+assert  (((direction_angle_cond)&(type_code_V)).sum() == 0) 
+
+####

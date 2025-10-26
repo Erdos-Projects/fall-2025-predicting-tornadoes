@@ -10,16 +10,10 @@ CIG- Sky Condition Observation- Ceiling Determination Code,0.6846297726445444
 CIG- Sky Condition Observation- Cavok Code,0.06905885072850158
 DEW- Air Temperature Observation- Dew Point Temperature,0.07726863557212707
 DEW- Air Temperature Observation- Dew Point Quality Code,0.010894320540694757
-GA1- Sky Cover Layer- Coverage Code,0.4530163211900007
-GA1- Sky Cover Layer- Coverage Quality Code,0.4412556445345165
-GA1- Sky Cover Layer- Base Height Dimensions,0.6106888299703878
-GA1- Sky Cover Layer- Base Height Quality Code,0.4405811288085236
-GA1- Sky Cover Layer- Cloud Type Code,0.9871977284130373
-GA1- Sky Cover Layer- Cloud Type Quality Code,0.44042064694481886
-MA1-Atmospheric Pressure Observation- Altimeter Setting Rate,0.1073021092604799
-MA1-Atmospheric Pressure Observation- Altimeter Quality Code,0.07189710468582447
-MA1-Atmospheric Pressure Observation- Station Pressure Rate,0.2876265408718408
-MA1-Atmospheric Pressure Observation- Station Pressure Quality Code,0.07189710468582447
+MA1- Atmospheric Pressure Observation- Altimeter Setting Rate,0.1073021092604799
+MA1- Atmospheric Pressure Observation- Altimeter Quality Code,0.07189710468582447
+MA1- Atmospheric Pressure Observation- Station Pressure Rate,0.2876265408718408
+MA1- Atmospheric Pressure Observation- Station Pressure Quality Code,0.07189710468582447
 SLP- Atmospheric Pressure Observation- Sea Level Pressure,0.5177544590592934
 SLP- Atmospheric Pressure Observation- Sea Level Pressure Quality Code,0.0
 TMP- Air Temperature Observation- Air Temperature,0.07236194870483142
@@ -28,7 +22,7 @@ VIS- Visibility Observation- Distance Dimension,0.07291287494958042
 VIS- Visibility Observation- Distance Quality Code,0.00109385913996478
 VIS- Visibility Observation- Variability Code,0.0950993388885063
 VIS- Visibility Observation- Quality Variability Code,0.0
-WND- Wind Observation- Direction Angle,0.1268452339960845
+WND- Wind Observation- Direction Angle,0.13571846685096461
 WND- Wind Observation- Direction Quality Code,0.0
 WND- Wind Observation- Type Code,0.0
 WND- Wind Observation- Speed Rate,0.0729165641878265

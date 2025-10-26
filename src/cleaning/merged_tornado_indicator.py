@@ -178,13 +178,3 @@ def create_tornado_indicator(
 
     return data
 
-
-# ensure result is actually a timedelta series
-    if not np.issubdtype(time_diff.dtype, np.timedelta64):
-        raise TypeError(f"time_diff dtype is {time_diff.dtype}, expected timedelta64[ns]")
-    
-    
-    data.loc[mask, 'TORNADO_OCCURRENCE'] = ((time_diff.abs().dt.total_seconds()) <= (3600*time_window))
-    
-    
-    data["TORNADO_OCCURRENCE"].fillna(False, inplace = True)
