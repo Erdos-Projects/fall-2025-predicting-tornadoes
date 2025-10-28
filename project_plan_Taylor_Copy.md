@@ -36,25 +36,25 @@
 ---
 
 ## **5. Statistical Exploration**
-- [] Summarize distributions (mean, std, min, max) for key features.
-- [ ] Plot histograms or KDEs for numeric variables.
-- [ ] Identify skewed or heavy-tailed variables.
-- [ ] Look for normalization/scaling needs.
-- [ ] Compute correlations between weather features (temperature, pressure, wind, humidity).
+- [x] Summarize distributions (mean, std, min, max) for key features.
+- [x] Plot histograms or KDEs for numeric variables.
+- [x] Identify skewed or heavy-tailed variables.
+- [x] Look for normalization/scaling needs.
+- [x] Compute correlations between weather features (temperature, pressure, wind, humidity).
 
 ---
 
 ## **6. Spatial Analysis **
-- [ ] Plot station coordinates on a map to confirm coverage.
-- [ ] Check for duplicated or overlapping coordinates.
-- [ ] Compare tornado event coordinates with station locations.
+- [x] Plot station coordinates on a map to confirm coverage.
+- [x] Check for duplicated or overlapping coordinates.
+- [x] Compare tornado event coordinates with station locations.
 
 ---
 
 ## **7. Temporal Patterns**
-- [ ] Convert date/time fields to datetime and extract `year`, `month`, `hour`.
-- [ ] Plot tornado occurrences by month/year.
-- [ ] Examine diurnal (hourly) and seasonal patterns.
+- [x] Convert date/time fields to datetime and extract `year`, `month`, `hour`.
+- [x] Plot tornado occurrences by month/year.
+- [] Examine diurnal (hourly) and seasonal patterns.
 - [ ] Check for missing or uneven temporal sampling.
 
 ---
