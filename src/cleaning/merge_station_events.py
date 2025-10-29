@@ -1,10 +1,14 @@
 from src.cleaning.clean_stations import clean_station_data
 import pandas as pd
 import numpy as np
+import os
+import sys
+import pathlib
+import src.file_utilities.project_path as ppath
 
 def merge_station_events(
-    event_file_path:str = 'Data/events/processed/final_Oklahoma_Tornadoes_2000_2021.csv',
-    station_raw_dir:str='Data/stations/raw',
+    processed_event_path ='Data/events/processed/final_Oklahoma_Tornadoes_2000_2021.csv',
+    raw_directory = "Data/stations/raw",
     drop_cols:list[str] = None,
     split_tuples:bool = False,
     mapping: dict = None,
@@ -13,8 +17,6 @@ def merge_station_events(
     f"""
     Cleans the raw station Pandas DataFrames and combines them into a new DataFrame.
     Args:
-    event_file_path: str - local GitHub path to the processed Oklahoma Tornadoes.
-    station_raw_dir : str - local GitHub directory containing the raw station data.
     drop_cols: list[str] or None - list of columns to be dropped in the merged DataFrame.
     mapping : dict — key = column name, value = list of new sub‐column names. This dictionary
     represents the columns in the merged data frame that are to be split into new sub-columns
@@ -26,8 +28,10 @@ def merge_station_events(
     A new pandas DataFrame with the expanded columns.
     """
     
+    
+
     # read in station data
-    station_df= clean_station_data(raw_dir=station_raw_dir, 
+    station_df= clean_station_data(raw_directory=raw_directory,
                                 drop_cols=drop_cols,
                                 split_tuples=split_tuples,
                                 mapping = mapping,
@@ -36,8 +40,10 @@ def merge_station_events(
                                 )
     
     # read in event data
-
-    event_df = pd.read_csv(event_file_path)
+    
+    project_root = ppath.find_project_root()
+    absolute_processed_data_path = project_root / pathlib.Path(processed_event_path)
+    event_df = pd.read_csv(absolute_processed_data_path)
     station_df['STATION_DATE_TIME'] = pd.to_datetime(station_df['STATION_DATE_TIME'], errors='coerce')
     event_df['TORNADO_BEGIN_DATE_TIME'] = pd.to_datetime(event_df['TORNADO_BEGIN_DATE_TIME'], errors='coerce')
     

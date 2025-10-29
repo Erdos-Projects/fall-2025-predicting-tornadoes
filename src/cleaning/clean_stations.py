@@ -5,6 +5,8 @@ import pandas as pd
 import numpy as np
 import os
 import math
+import pathlib
+import src.file_utilities.project_path as ppath
 
 
 
@@ -58,7 +60,7 @@ def split_tuple_features(df: pd.DataFrame,
 
 
 def clean_station_data(
-    raw_dir:str='Data/stations/raw',
+    raw_directory = "Data/stations/raw",
     drop_cols:list[str] = None,
     split_tuples:bool = False,
     mapping: dict = None,
@@ -68,7 +70,7 @@ def clean_station_data(
     f"""
     Cleans the raw station Pandas DataFrames and combines them into a new DataFrame.
     Args:
-    raw_dir : str - local GitHub directory containing the raw station data.
+    raw_directory: str - local project path to directory. Default value is "Data/stations/raw".
     drop_cols: list[str] or None - list of columns to be dropped in the merged DataFrame.
     mapping : dict — key = column name, value = list of new sub‐column names. This dictionary
     represents the columns in the merged data frame that are to be split into new sub-columns
@@ -80,13 +82,15 @@ def clean_station_data(
     A new pandas DataFrame with the expanded columns.
     """
     # Step 1: Read in each station csv and concatenate all.
+    project_root = ppath.find_project_root()
+    
+    station_dir = project_root / pathlib.Path(raw_directory)
 
-
-    raw_station_data = os.listdir(raw_dir) # list files in directory
+    raw_station_data = os.listdir(station_dir) # list files in directory
 
     station_csv_files = [file for file in raw_station_data if ('.csv' in file) and ('Station' in file)] # get csv files
 
-    station_dfs=[pd.read_csv(f"{raw_dir}/{file}").copy() for file in station_csv_files]
+    station_dfs=[pd.read_csv(os.path.join(station_dir,file)).copy() for file in station_csv_files]
     stations_df = pd.concat(station_dfs, axis = 0)
     merged = stations_df.reset_index().drop(['index', 'Unnamed: 0'], axis =1).copy() 
 

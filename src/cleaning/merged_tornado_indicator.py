@@ -76,7 +76,10 @@ def within_radius(lat_lon_1:tuple[float,float],lat_lon_2:tuple[float,float], val
 
 ### HYPERPARAMETER time_window in hours
 ### if a tornado happens at 16:00 and time_window is 1,
-### then a tornado is indicated at 15:00,16:00,17:00
+### then a tornado is indicated at 15:00,16:00. We don't want to know
+### one hour after since this doesn't give us information about
+### what factors induce a tornadic episode, rather what happens after.
+### Therefore, this would taint the modeling performance.
 
 ### HYPERPARAMETER valid_radius in km
 ### if a tornado occurs within valid_radius km of a station
@@ -88,8 +91,8 @@ def within_radius(lat_lon_1:tuple[float,float],lat_lon_2:tuple[float,float], val
 ### it will be counted. This ASSUMES TORNADO TAKES STRAIGHT LINE.
 
 def create_tornado_indicator(
-    event_file_path:str = 'Data/events/processed/final_Oklahoma_Tornadoes_2000_2021.csv',
-    station_raw_dir:str='Data/stations/raw',
+    processed_event_path:str = 'Data/events/processed/final_Oklahoma_Tornadoes_2000_2021.csv',
+    raw_directory:str='Data/stations/raw',
     drop_cols:list[str] = None,
     split_tuples:bool = False,
     mapping: dict = None,
@@ -100,8 +103,6 @@ def create_tornado_indicator(
     f""" Creates a tornado indicator column in the station-events merged DataFrame.
 
     Args:
-        event_file_path: str - local GitHub path to the processed Oklahoma Tornadoes.
-        station_raw_dir : str - local GitHub directory containing the raw station data.
         drop_cols: list[str] or None - list of columns to be dropped in the merged DataFrame.
         mapping : dict — key = column name, value = list of new sub‐column names. This dictionary
         represents the columns in the merged data frame that are to be split into new sub-columns
@@ -119,18 +120,19 @@ def create_tornado_indicator(
         columns are split into sub-columns as dictated by {mapping} and {tuple_sep}, and creates a
         new column new column 'TORNADO_OCCURRENCE' consisting of boolean values. A sample has an entry
         of True in 'TORNADO_OCCURRENCE' if the station in the sample observes a Tornado within 
-        {time_window} hours of the tornado's beginning time and the station is within {val_radius}
+        {time_window} hours BEFORE the tornado's beginning time and the station is within {val_radius}
         kilometers of the tornado's STARTING position.
     """
     # Note that time_window and val_radius are in hours and km respectively.
 
-    data = merge_station_events(event_file_path,
-                        station_raw_dir,
-                        drop_cols,
-                        split_tuples,
-                        mapping,
-                        drop_originals,
-                        tuple_sep)
+    data = merge_station_events(
+                        processed_event_path=processed_event_path,
+                        raw_directory=raw_directory,
+                        drop_cols = drop_cols,
+                        split_tuples= split_tuples,
+                        mapping= mapping,
+                        drop_originals= drop_originals,
+                        tuple_sep=tuple_sep)
     
     # Tornado starting distance from station
     def initial_tornado_to_station_distance(pd_row):
@@ -164,13 +166,13 @@ def create_tornado_indicator(
     (data['STATION_DATE_TIME'].notna())
     )   
 
-    time_diff = data['TORNADO_BEGIN_DATE_TIME'] - data.loc[mask, 'STATION_DATE_TIME']
+    time_diff = data.loc[mask,'TORNADO_BEGIN_DATE_TIME'] - data.loc[mask, 'STATION_DATE_TIME']
     # ensure result is actually a timedelta series
     if not np.issubdtype(time_diff.dtype, np.timedelta64):
         raise TypeError(f"time_diff dtype is {time_diff.dtype}, expected timedelta64[ns]")
     
     
-    data.loc[mask, 'TORNADO_OCCURRENCE'] = ((time_diff.abs().dt.total_seconds()) <= (3600*time_window))
+    data.loc[mask, 'TORNADO_OCCURRENCE'] = ((time_diff.dt.total_seconds()) <= (3600*time_window))
     
     
     data["TORNADO_OCCURRENCE"].fillna(False, inplace = True)
