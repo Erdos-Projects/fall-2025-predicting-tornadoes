@@ -2,6 +2,7 @@
 from sklearn.base import BaseEstimator, TransformerMixin
 import pandas as pd
 import numpy as np
+import datetime as dt
 
 # Values to replace with NaN
 class ReplaceValuesWithNaN(BaseEstimator, TransformerMixin):
@@ -153,3 +154,93 @@ class DropDuplicates(BaseEstimator,TransformerMixin):
     def transform(self,X):
         X = X.copy()
         return X.drop_duplicates()
+    
+    
+    
+#================== Pre Train-Test Split Feature Engineering===============
+
+class GrabYear(BaseEstimator,TransformerMixin):
+    """
+    creates a new column that records the year of an 
+    observation
+    """
+    def __init__(self, column = 'STATION_DATE_TIME', new_col ='year'):
+        self.column = column
+        self.new_col = new_col
+    
+    def fit(self, X, y=None):
+        # nothing to learn
+        return self
+    def transform(self, X):
+        X = X.copy()
+        X[self.new_col] = X[self.column].dt.year
+        return X
+
+class DatetimeSinCosConverter(BaseEstimator,TransformerMixin):
+    """
+    given a datatime column creates new columns with cyclic 
+    sine,cosine representations of months in year 1--12, 
+    days in year 1--365, hours in day 0--23.
+    
+    """
+    def __init__(self, 
+                column = 'STATION_DATE_TIME',
+                monthofyear =True,
+                dayofyear = True, 
+                hourofday =True):
+        self.column = column
+        self.monthofyear = monthofyear
+        self.dayofyear = dayofyear
+        self.hourofday = hourofday
+        
+    def fit(self, X,y=None):
+        # nothing to learn
+        return self
+    
+    def transform(self, X):
+        X = X.copy()
+        
+        if self.monthofyear:
+            month = X[self.column].dt.month
+            X['sin_monthofyear'] = np.sin((month)*2*np.pi/12)
+            X['cos_monthofyear'] = np.cos((month)*2*np.pi/12)
+        
+        if self.dayofyear:
+            day = X[self.column].dt.dayofyear
+            X['sin_dayofyear'] = np.sin((day)*2*np.pi/365)
+            X['cos_dayofyear'] = np.cos((day)*2*np.pi/365)
+        if self.hourofday:
+            hour = X[self.column].dt.hour
+            X['sin_hourofday'] = np.sin((hour)*2*np.pi/24)
+            X['cos_hourofday'] = np.cos((hour)*2*np.pi/24)
+        
+        return X
+
+
+
+
+
+
+#============= Feature Engineering (Pre Train-Test Split)======================
+
+class SubtractColumns(BaseEstimator,TransformerMixin):
+    """
+    creates a new column whose values are from taking the 
+    difference between two given columns
+    """
+    def __init__(self, col_1, col_2, new_col):
+        self.col_1 = col_1
+        self.col_2 = col_2
+        self.new_col = new_col
+
+    def fit(self,X,y=None):
+        # nothing to learn
+        return self
+    
+    def transform(self,X):
+        X = X.copy()
+        if self.col_1 is None or self.col_2 is None:
+            return X
+        else: 
+            X[self.new_col] = X[self.col_1] - X[self.col_2]
+        return X
