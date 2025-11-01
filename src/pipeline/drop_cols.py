@@ -31,21 +31,23 @@ pre_split_drop = Pipeline([
 
 # Definitely needs to happen d object type/ redundant
 # given other features/ 
-post_cols_to_drop=[
-    'STATION_LON',
-    'STATION_LAT',
+post_split_cols_to_drop=[
+    'STATION',
+    #'STATION_LON',
+    #'STATION_LAT',
     'WND- Wind Observation- Type Code',
     'SLP- Atmospheric Pressure Observation- Sea Level Pressure',
-    'TMP- Air Temperature Observation- Air Temperature' 
+    'TMP- Air Temperature Observation- Air Temperature',
+    'STATION_DATE_TIME'
 ]
 
-post_cols_to_drop = Pipeline([
-    ("Post Train-Test split drops", DropColumns(columns = post_cols_to_drop))
+post_split_drop = Pipeline([
+    ("Post Train-Test split drops", DropColumns(columns = post_split_cols_to_drop))
 ])
 
 # Optional test after baseline
 # Current thoughts on columns to drop that aren't required 
-op_post_cols_to_drop = [
+op_post_split_cols_to_drop = [
     'MA1- Atmospheric Pressure Observation- Altimeter Setting Rate'
     'WND- Wind Observation- Speed Rate'
     'WND- Wind Observation- Direction Angle',
@@ -53,9 +55,8 @@ op_post_cols_to_drop = [
     'CIG- Sky Condition Observation- Ceiling Height Dimension',
     'WND- Wind Observation- Speed Rate',
     'WND- Wind Observation- Direction Angle',
-    'STATION_DATE_TIME',
 ]
 
-op_cols_to_drop = Pipeline([
-    ("Post Train-Test split optional drops", DropColumns(columns = op_post_cols_to_drop))
+op_post_split_drop = Pipeline([
+    ("Post Train-Test split optional drops", DropColumns(columns = op_post_split_cols_to_drop))
 ])
