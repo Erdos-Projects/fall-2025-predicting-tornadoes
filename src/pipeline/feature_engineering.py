@@ -14,7 +14,7 @@ from src.pipeline.transformers import (
 
 # Pre Train-Test Split
 
-Pre_Train_Test_Split_FE = Pipeline(
+pre_train_test_split_FE = Pipeline(
     [
         ("Make year column", GrabYear(column ='STATION_DATE_TIME', new_col ='year')),
         ("Sine/Cosine columns", DatetimeSinCosConverter(column= 'STATION_DATE_TIME',

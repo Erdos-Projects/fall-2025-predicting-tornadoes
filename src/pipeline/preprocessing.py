@@ -139,6 +139,9 @@ numeric_scale =  ColumnTransformer(
 
 # columns to drop (preprocessing)
 
+
+# preprocessing pipeline
+
 columns_to_drop =[
     'CIG- Sky Condition Observation- Ceiling Quality Code',
     'CIG- Sky Condition Observation- Cavok Code',
@@ -153,15 +156,13 @@ columns_to_drop =[
     'WND- Wind Observation- Direction Quality Code',
     'WND- Wind Observation- Speed Quality Code',
     'CIG- Sky Condition Observation- Ceiling Determination Code'
-]
+        ]
 
-# preprocessing pipeline
-
-
-preprocessing= Pipeline([
+preprocessing = Pipeline([
     ('Values to NaN', to_nan),
     ('NaN Imputer', na_imputer),
-    ('Drop Ceiling Determination Code',DropColumns(columns=columns_to_drop)),
+    ('Drop Columns PreSplit',DropColumns(columns=columns_to_drop)),
     ('Drop Duplicates', DropDuplicates()),
     ('Scale Columns',numeric_scale)
-])
+    ])
+

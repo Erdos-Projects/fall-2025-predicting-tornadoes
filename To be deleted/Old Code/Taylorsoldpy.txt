@@ -324,3 +324,29 @@ type_code_V = data['WND- Wind Observation- Type Code'] == 'V'
 assert  (((direction_angle_cond)&(type_code_V)).sum() == 0) 
 
 ####
+
+precs_unbal,recalls_unbal,thres_unbal = precision_recall_curve(y_test,probs_xg)
+precs_bal,recalls_bal,thres_bal = precision_recall_curve(y_test,probs_bxg)
+
+plt.plot(recalls_unbal, precs_unbal, label= 'XGBoost Unbalanced', color ='tab:blue')
+plt.plot(recalls_bal, precs_bal, label= 'XGBoost Balanced', color ='tab:orange')
+plt.xlabel('Recall')
+plt.ylabel('Precision')
+plt.title('Precision Recall Curves - XGBoost')
+plt.legend()
+plt.grid(True, alpha =0.3)
+plt.tight_layout()
+plt.show()
+
+
+#########
+
+thresholds = [0.5, 0.1, 0.05, 0.01, 0.005, 0.001]
+for t in thresholds:
+    preds = (probs_rfc >= t).astype(int)
+    print(f"\n Unbalanced RFC \nThreshold = {t}")
+    print(classification_report(y_test, preds, digits=3))
+    preds = (probs_rfc_w >= t).astype(int)
+    print(f"\n Balanced RFC \nThreshold = {t}")
+    print(classification_report(y_test, preds, digits=3))
+    
