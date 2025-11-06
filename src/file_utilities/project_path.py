@@ -16,6 +16,8 @@ def find_project_root(marker = ".git"):
         # / does not do division between Path objects and
         # even between path objects and strings
         if (parent/marker).exists():
+            project_root=parent
+            sys.path.append(str(project_root))
             return parent
         
     raise RuntimeError(f"Cannot find project root containing {marker}")
