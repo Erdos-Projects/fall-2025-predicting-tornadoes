@@ -244,3 +244,107 @@ class SubtractColumns(BaseEstimator,TransformerMixin):
         else: 
             X[self.new_col] = X[self.col_1] - X[self.col_2]
         return X
+    
+    
+#================ Features Engineering (Post Train-Test Split) ================
+from sklearn.base import BaseEstimator, TransformerMixin
+import numpy as np
+import pandas as pd
+
+class HourlyRates(BaseEstimator, TransformerMixin):
+    def __init__(self, 
+                 columns=None, 
+                 time_col='STATION_DATE_TIME',
+                 id_col='STATION',
+                 max_gap_hours=3):
+        
+        if columns is None:
+            columns = [
+                'SLP- Atmospheric Pressure Observation- Sea Level Pressure',
+                'DEW- Air Temperature Observation- Dew Point Temperature',
+                'TMP- Air Temperature Observation- Air Temperature',
+                'TMP-DEW'
+            ]
+        self.columns = columns
+        self.time_col = time_col
+        self.id_col = id_col
+        self.max_gap_hours = max_gap_hours
+        
+    def fit(self, X, y=None):
+        # Learns nothing
+        return self
+
+    def transform(self, X):
+        X = X.copy()
+        original_order = X.index  # PRESERVES INPUT ORDER important for splitting
+
+        # Sort for proper temporal grouping
+        X = X.sort_values([self.id_col, self.time_col])
+
+        # Compute time deltas per station
+        dt_hours = X.groupby(self.id_col)[self.time_col].diff().dt.total_seconds() / 3600.0
+
+        # Compute per-hour rates per column
+        for col in self.columns:
+            col_diff = X.groupby(self.id_col)[col].diff()
+            rate = col_diff / dt_hours
+
+            # Mask bad or too-large gaps
+            mask_bad = (dt_hours.isna()) | (dt_hours <= 0) | (dt_hours > self.max_gap_hours)
+            rate[mask_bad] = np.nan
+
+            X[f"PER_HOUR_{col}"] = rate
+
+        # # PRESERVES INPUT ORDER important for splitting
+        X = X.loc[original_order]
+        return X
+
+
+class DifferencesByHours(BaseEstimator, TransformerMixin):
+    def __init__(self,
+                 columns=None,
+                 time_col='STATION_DATE_TIME',
+                 id_col='STATION',
+                 num_hours=2):
+        
+        if columns is None:
+            columns = [
+                'MA1- Atmospheric Pressure Observation- Station Pressure Rate',
+                'DEW- Air Temperature Observation- Dew Point Temperature',
+                'TMP- Air Temperature Observation- Air Temperature',
+            ]
+        self.columns = columns
+        self.time_col = time_col
+        self.id_col = id_col
+        self.num_hours = num_hours
+        
+    def fit(self, X, y=None):
+        return self
+    
+    def transform(self, X):
+        X = X.copy()
+        original_order = X.index  # PRESERVES INPUT ORDER important for splitting
+        X = X.sort_values([self.id_col, self.time_col])
+
+        results = []  # list to collect per-station computations
+
+        # Group by station and apply rolling logic
+        for station, g in X.groupby(self.id_col):
+            g = g.set_index(self.time_col)  # use datetime index for rolling
+            
+            for col in self.columns:
+                diff_name = f"{self.num_hours}H_DIFF_{col}"
+                g[diff_name] = (
+                    g[col]
+                    .rolling(f"{self.num_hours}h", closed='left')
+                    .apply(lambda x: x.iloc[-1] - x.iloc[0] if len(x) > 1 else np.nan, raw=False)
+                )
+            results.append(g.reset_index())
+
+        # Combine all station groups
+        out = pd.concat(results, axis=0)
+
+        #  PRESERVES INPUT ORDER important for splitting
+        out = out.set_index(original_order)
+        out = out.loc[original_order]
+        return out

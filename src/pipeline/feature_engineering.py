@@ -9,7 +9,9 @@ import pandas as pd
 from src.pipeline.transformers import (
     GrabYear,
     DatetimeSinCosConverter,
-    SubtractColumns
+    SubtractColumns,
+    HourlyRates,
+    DifferencesByHours
 )
 
 # Pre Train-Test Split
@@ -27,3 +29,12 @@ pre_train_test_split_FE = Pipeline(
     ]
 )
 
+
+# Post Train-Test Split (and CV splits)
+
+post_train_test_split_FE = Pipeline(
+    [
+        ("Hourly Rates", HourlyRates()),
+        ("Differences of values every 2 hours", DifferencesByHours())
+    ]
+)

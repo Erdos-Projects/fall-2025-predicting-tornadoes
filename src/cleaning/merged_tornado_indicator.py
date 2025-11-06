@@ -2,7 +2,9 @@ import pandas as pd
 import numpy as np
 import datetime
 import math
-from src.cleaning.merge_station_events import merge_station_events
+import pathlib
+import os
+import project_path as ppath
 # Create Tornado indicator column
 # Things to keep in mind:
 # 1. At what time should a tornado be indicated? 
@@ -15,30 +17,26 @@ from src.cleaning.merge_station_events import merge_station_events
 
 # Haversine Formula for computing the number of kilometers between 
 # To use this must convert lat lon from degrees to radians.
-def lat_lon_metric(lat_lon_1:tuple[float,float],lat_lon_2:tuple[float,float]):
+def lat_lon_metric(lat_1,lon_1,lat_2,lon_2):
     f""" Calculates the great circle distance between two points on Earth given
     their latitude and longitude.
 
     Args:
-        lat_lon_1 : tuple[float,float] - a latitude,longitude coordinate. Both entries
-        are in degrees.
-        lat_lon_2 : tuple[float,float] - a latitude,longitude coordinate. Both entries
-        are in degrees.
+        lat1, lon1, lat2, lon2 : float or array-like
+        Latitude and longitude in degrees. Can be scalars or pandas Series.
 
     Returns:
-        float -  the great circle distance between {lat_lon_1} and {lat_lon_2} in kilometers.
+        float or Series : Distance in kilometers
     """
     Rd = 6371 # approx. Earth radius in km
-    lat_1,lon_1 = lat_lon_1[0],lat_lon_1[1] # in deg
-    lat_2,lon_2 = lat_lon_2[0],lat_lon_2[1] # in deg
-    rlat_1 = (lat_1*(math.pi))/(180) # convert to radians
-    rlon_1 = (lon_1*math.pi)/(180) # convert to radians
-    rlat_2 = (lat_2*math.pi)/(180) # convert to radians
-    rlon_2 = (lon_2*math.pi)/(180) # convert to radians
-    Term_1 = (math.sin((rlat_2-rlat_1)/2))**2
-    Term_2 = math.cos(rlat_1)*math.cos(rlat_2)*(math.sin((rlon_2-rlon_1)/2))**2
+    rlat_1 = (lat_1*(np.pi))/(180) # convert to radians
+    rlon_1 = (lon_1*np.pi)/(180) # convert to radians
+    rlat_2 = (lat_2*np.pi)/(180) # convert to radians
+    rlon_2 = (lon_2*np.pi)/(180) # convert to radians
+    Term_1 = (np.sin((rlat_2-rlat_1)/2))**2
+    Term_2 = np.cos(rlat_1)*np.cos(rlat_2)*(np.sin((rlon_2-rlon_1)/2))**2
     a = Term_1+Term_2
-    c = 2*math.atan2(math.sqrt(a),math.sqrt(1-a))
+    c = 2*np.arctan2(np.sqrt(a),np.sqrt(1-a))
     D=Rd*c
     return D
 
@@ -72,7 +70,62 @@ def within_radius(lat_lon_1:tuple[float,float],lat_lon_2:tuple[float,float], val
             return True
         else:
             return False
+
+
+
+
+def tornado_station_matcher(df_station,
+                                  df_events,
+                                  val_radius,
+                                  time_window,
+                                  station_datetime_column='DATE',
+                                  begin_event_datetime_column='TORNADO_BEGIN_DATE_TIME',
+                                  end_event_datetime_column='TORNADO_END_DATE_TIME'
+                                  ):
     
+    # Ensure datetime columns are proper datetime type
+    if not pd.api.types.is_datetime64_any_dtype(df_station[station_datetime_column]):
+        df_station[station_datetime_column] = pd.to_datetime(df_station[station_datetime_column])
+    if not pd.api.types.is_datetime64_any_dtype(df_events[begin_event_datetime_column]):
+        df_events[begin_event_datetime_column] = pd.to_datetime(df_events[begin_event_datetime_column])
+    if not pd.api.types.is_datetime64_any_dtype(df_events[end_event_datetime_column]):
+        df_events[end_event_datetime_column] = pd.to_datetime(df_events[end_event_datetime_column])
+    
+    # Create 'TORNADO_OCCURRENCE' columns initial values of false
+    df_station['TORNADO_OCCURRENCE'] = False
+    # Create 'TORNADO_BEGIN_TIME' columns initial values of np.nan
+    df_station['TORNADO_BEGIN_TIME'] = pd.NaT
+    
+    # Important for lat_lon_metric
+    df_events = df_events.dropna(subset=['TORNADO_BEGIN_LAT', 'TORNADO_BEGIN_LON'])
+    df_station =df_station.dropna(subset=['LATITUDE','LONGITUDE'])
+    # For each tornado event and each station observation 
+    # determine if station observes tornado.
+    # time_window and val_radius
+    # Will 'for loop on tornadoes'. Likely a better way to do this- room for improvement.
+    for _,row in df_events.iterrows():
+        tornado_begin_time = row[begin_event_datetime_column]
+        tornado_begin_lat = row['TORNADO_BEGIN_LAT']
+        tornado_begin_lon= row['TORNADO_BEGIN_LON']
+        
+        # time_window mask
+        time_diff_hours = (tornado_begin_time - df_station[station_datetime_column]).dt.total_seconds() / 3600  
+        time_window_mask = (time_diff_hours >= 0) & (time_diff_hours <= time_window)
+        
+        
+        # distance_mask
+        station_tornado_distances = lat_lon_metric(lat_1=df_station['LATITUDE'],
+                                                    lon_1=df_station['LONGITUDE'],
+                                                    lat_2=tornado_begin_lat,
+                                                    lon_2=tornado_begin_lon)
+        distance_mask = station_tornado_distances <= val_radius
+        
+        df_station.loc[(time_window_mask)&(distance_mask),'TORNADO_OCCURRENCE']=True
+        df_station.loc[(time_window_mask)&(distance_mask),'TORNADO_BEGIN_TIME']= tornado_begin_time
+    
+    # check that time_window is respected
+    assert(((df_station['TORNADO_BEGIN_TIME']-df_station['DATE']).dt.total_seconds() / 3600).max()<= time_window )
+    return df_station
 
 ### HYPERPARAMETER time_window in hours
 ### if a tornado happens at 16:00 and time_window is 1,
@@ -93,249 +146,64 @@ def within_radius(lat_lon_1:tuple[float,float],lat_lon_2:tuple[float,float], val
 # Columns from merged station datasets (without tornado indicator)
 # to drop. Can be modified if desired. Will be the default value in 
 # create_tornado_indicator function below
-columns_to_drop = ['NAME',
-                     'SOURCE',
-                     'REPORT_TYPE',
-                     'CALL_SIGN',
-                     'QUALITY_CONTROL',
-                     'CALL_SIGN.1',
-                     'QUALITY_CONTROL.1',
-                     'REPORT_TYPE.1',
-                     'SOURCE.1',
-                     'AB1',
-                     'AD1',
-                     'AE1',
-                     'AG1',
-                     'AH1',
-                     'AH2',
-                     'AH3',
-                     'AH4',
-                     'AH5',
-                     'AH6',
-                     'AI1',
-                     'AI2',
-                     'AI3',
-                     'AI4',
-                     'AI5',
-                     'AI6',
-                     'AK1',
-                     'AM1',
-                     'AN1',
-                     'AT1',
-                     'AT2',
-                     'AT3',
-                     'AT4',
-                     'AT5',
-                     'AT6',
-                     'AT7',
-                     'AT8',
-                     'AU1',
-                     'AU2',
-                     'AU3',
-                     'AU4',
-                     'AU5',
-                     'AW1',
-                     'AW2',
-                     'AW3',
-                     'AW4',
-                     'AW5',
-                     'AW6',
-                     'AW7',
-                     'AX1',
-                     'AX2',
-                     'AX3',
-                     'AX4',
-                     'AX5',
-                     'AX6',
-                     'ED1',
-                     'EQD',
-                     'GD1',
-                     'GD2',
-                     'GD3',
-                     'GD4',
-                     'GE1',
-                     'GF1',
-                     'IA1',
-                     'KC1',
-                     'KC2',
-                     'KD1',
-                     'KD2',
-                     'KE1',
-                     'MH1',
-                     'MK1',
-                     'MV1',
-                     'MW1',
-                     'MW2',
-                     'MW3',
-                     'MW4',
-                     'MW5',
-                     'OD1',
-                     'OE1',
-                     'OE2',
-                     'OE3',
-                     'REM',
-                     'SA1',
-                     'UA1',
-                     'UG1',
-                     'WA1',
-                     'AA1',
-                     'AA2',
-                     'AA3',
-                     'AA4',
-                     'AJ1',
-                     'AL1',
-                     'GA1',
-                     'GA2',
-                     'GA3',
-                     'GA4',
-                     'GA5',
-                     'GA6',
-                     'GJ1',
-                     'GK1',
-                     'GP1',
-                     'GQ1',
-                     'GR1',
-                     'HL1',
-                     'KA1',
-                     'KA2',
-                     'KA3',
-                     'KA4',
-                     'KB1',
-                     'KB2',
-                     'KB3',
-                     'KG1',
-                     'KG2',
-                     'MD1',
-                     'MF1',
-                     'MG1',
-                     'OC1',
-                     'RH1',
-                     'RH2',
-                     'RH3'
-              ]
-
-# see mapping below
-mapping = {
-
-'CIG': ['CIG- Sky Condition Observation- Ceiling Height Dimension',
-        'CIG- Sky Condition Observation- Ceiling Quality Code',
-        'CIG- Sky Condition Observation- Ceiling Determination Code',
-        'CIG- Sky Condition Observation- Cavok Code'],
-
-'DEW':['DEW- Air Temperature Observation- Dew Point Temperature',
-       'DEW- Air Temperature Observation- Dew Point Quality Code'],
-
-'MA1':['MA1- Atmospheric Pressure Observation- Altimeter Setting Rate',
-       'MA1- Atmospheric Pressure Observation- Altimeter Quality Code',
-       'MA1- Atmospheric Pressure Observation- Station Pressure Rate',
-       'MA1- Atmospheric Pressure Observation- Station Pressure Quality Code'],
-
-
-'SLP':['SLP- Atmospheric Pressure Observation- Sea Level Pressure',
-       'SLP- Atmospheric Pressure Observation- Sea Level Pressure Quality Code'],
-
-'TMP':['TMP- Air Temperature Observation- Air Temperature',
-       'TMP- Air Temperature Observation- Air Temperature Quality Code'],
-
-'VIS': ['VIS- Visibility Observation- Distance Dimension',
-       'VIS- Visibility Observation- Distance Quality Code',
-       'VIS- Visibility Observation- Variability Code',
-       'VIS- Visibility Observation- Quality Variability Code'],
-
-'WND':['WND- Wind Observation- Direction Angle',
-       'WND- Wind Observation- Direction Quality Code',
-       'WND- Wind Observation- Type Code',
-       'WND- Wind Observation- Speed Rate',
-       'WND- Wind Observation- Speed Quality Code'],
-}
 
 def create_tornado_indicator(
     processed_event_path:str = 'Data/events/processed/final_Oklahoma_Tornadoes_2000_2021.csv',
-    raw_directory:str='Data/stations/raw',
-    drop_cols:list[str] = columns_to_drop,
-    split_tuples:bool = True,
-    mapping: dict = mapping,
-    drop_originals:bool =True,
-    tuple_sep:str =',',
-    time_window:float = 1,
-    val_radius = 50):
+    processed_station_directory:str='Data/stations/processed',
+    time_window:float = 2,
+    val_radius = 75):
     f""" Creates a tornado indicator column in the station-events merged DataFrame.
 
     Args:
-        drop_cols: list[str] or None - list of columns to be dropped in the merged DataFrame.
-        mapping : dict — key = column name, value = list of new sub‐column names. This dictionary
-        represents the columns in the merged data frame that are to be split into new sub-columns
-        as dictated in the associated dictionary value.
-        drop_original : bool — if True, drop the original columns given by the keys of {mapping} 
-        after performing the splitting of the column.
-        tuple_sep : str or None — if the tuple is stored as a string with a separator, 
-        provide the separator (e.g., ",").
-        time_window : float - a positive float
+        processed_event_path:str - path to Oklahoma Tornado csv file.
+        processed_station_directory:str - path to processed station data directory.
+        time_window : float - a positive float.
         val_radius : float - a positive float.
 
     Returns:
-        pd.DataFrame : creates a station-events 
-        merged DataFrame, where columns from {drop_cols} are dropped, if {split_tuples} is True
-        columns are split into sub-columns as dictated by {mapping} and {tuple_sep}, and creates a
-        new column new column 'TORNADO_OCCURRENCE' consisting of boolean values. A sample has an entry
-        of True in 'TORNADO_OCCURRENCE' if the station in the sample observes a Tornado within 
-        {time_window} hours BEFORE the tornado's beginning time and the station is within {val_radius}
-        kilometers of the tornado's STARTING position.
+        pd.DataFrame : creates a new pd.dataframe that merges tornado events with station data
+        provided tornado begins within {time_window} hours after station observation and 
+        tornado begins within {val_radius} kilometers of station.
     """
-    # Note that time_window and val_radius are in hours and km respectively.
+    
+    project_root = ppath.find_project_root()
+    pathlib_path_to_folder = pathlib.Path(processed_station_directory)
+    local_path_to_folder = project_root / pathlib_path_to_folder
+    print(f'Searching for {local_path_to_folder}')
+    processed_station_files = os.listdir(local_path_to_folder)
+    print(f'Found {local_path_to_folder}')
+    
+    processed_station_csv_files = [file for file in processed_station_files if file.endswith('.csv')]
+    
+    # Create output directory if it doesn't exist
+    local_event_station_indicator_path = project_root / pathlib.Path('Data/event_station_indicator/')
+    local_event_station_indicator_path.mkdir(parents=True, exist_ok=True)
+    
+    
+    # read in event data 
+    
+    events_csv = project_root/pathlib.Path(processed_event_path)
+    df_events= pd.read_csv(events_csv)
+    
+    
 
-    data = merge_station_events(
-                        processed_event_path=processed_event_path,
-                        raw_directory=raw_directory,
-                        drop_cols = drop_cols,
-                        split_tuples= split_tuples,
-                        mapping= mapping,
-                        drop_originals= drop_originals,
-                        tuple_sep=tuple_sep)
     
-    # Tornado starting distance from station
-    def initial_tornado_to_station_distance(pd_row):
-        station_lat_lon = pd_row['STATION_LAT'],pd_row['STATION_LON']
-        initial_tornado_lat_lon = pd_row['TORNADO_BEGIN_LAT'],pd_row['TORNADO_BEGIN_LON']
-        return lat_lon_metric(station_lat_lon,initial_tornado_lat_lon)
+    for station_csv in processed_station_csv_files:
+        station_csv_path = local_path_to_folder/pathlib.Path(station_csv)
+        df_station = pd.read_csv(station_csv_path)
+        df_tornado_indicator= tornado_station_matcher(df_station=df_station,
+                                df_events=df_events,
+                                time_window=time_window,
+                                val_radius=val_radius)
+        file_name = station_csv.replace('PROCESSED','TOR_INDICATOR')
+        df_tornado_indicator.to_csv(project_root/local_event_station_indicator_path/pathlib.Path(file_name),index=False)
     
-# Checks if lat,lon of station and beginning position of tornado are within valid radius
-    def apply_valid_radius(pd_row,valid_radius : float):
-        station_lat_lon = pd_row['STATION_LAT'],pd_row['STATION_LON']
-        initial_tornado_lat_lon = pd_row['TORNADO_BEGIN_LAT'],pd_row['TORNADO_BEGIN_LON']
-        return within_radius(station_lat_lon, initial_tornado_lat_lon,valid_radius) 
-    
-    data['TORNADO_INITIAL_DISTANCE_FROM_STATION'] = data.apply(lambda r : initial_tornado_to_station_distance(r),axis =1)
-    data[f'TORNADO_INITIAL_DISTANCE_FROM_STATION_WITHIN_{val_radius}_km'] = data.apply(lambda r: apply_valid_radius(r,val_radius),axis =1)
-
-# Ensures  datetime64[ns] type
-    data['TORNADO_BEGIN_DATE_TIME'] = pd.to_datetime(
-        data['TORNADO_BEGIN_DATE_TIME'], errors="coerce"
-    )
-    data['STATION_DATE_TIME'] = pd.to_datetime(
-        data['STATION_DATE_TIME'], errors="coerce"
-    )
-    data['TORNADO_END_DATE_TIME'] = pd.to_datetime(
-        data['TORNADO_END_DATE_TIME'], errors="coerce"
-    )
-# Mask for identifying tornado occurrence per station and station datetime
-    mask = (
-    (data[f'TORNADO_INITIAL_DISTANCE_FROM_STATION_WITHIN_{val_radius}_km']) &
-    (data['TORNADO_BEGIN_DATE_TIME'].notna()) &
-    (data['STATION_DATE_TIME'].notna())
-    )   
-
-    time_diff = data.loc[mask,'TORNADO_BEGIN_DATE_TIME'] - data.loc[mask, 'STATION_DATE_TIME']
-    # ensure result is actually a timedelta series
-    if not np.issubdtype(time_diff.dtype, np.timedelta64):
-        raise TypeError(f"time_diff dtype is {time_diff.dtype}, expected timedelta64[ns]")
-    
-    
-    data.loc[mask, 'TORNADO_OCCURRENCE'] = ((time_diff.dt.total_seconds()) <= (3600*time_window))
-    
-    
-    data["TORNADO_OCCURRENCE"].fillna(False, inplace = True)
+    return None
 
 
-    return data
 
+create_tornado_indicator(
+    processed_event_path= 'Data/events/processed/final_Oklahoma_Tornadoes_2000_2021.csv',
+    processed_station_directory='Data/stations/processed',
+    time_window = 2,
+    val_radius = 75)

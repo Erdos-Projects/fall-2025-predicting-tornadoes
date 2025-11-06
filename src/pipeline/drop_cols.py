@@ -70,9 +70,8 @@ def post_split_drop(post_cols_to_drop = None):
         # add necessary columns no repeats.
         post_cols_to_drop = list(set(post_cols_to_drop + necessary_to_drop))
     
-    return Pipeline([
-        ("Post Train-Test split drops", DropColumns(columns = post_cols_to_drop))
-        ])
+    return DropColumns(columns = post_cols_to_drop)
+        
 
 \
 
