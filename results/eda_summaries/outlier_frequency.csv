@@ -1,10 +1,8 @@
 ,0
-VIS- Visibility Observation- Distance Dimension,0.04187493198882803
-SLP- Atmospheric Pressure Observation- Sea Level Pressure,0.00503464035692263
-WND- Wind Observation- Speed Rate,0.005014690413145199
-MA1- Atmospheric Pressure Observation- Station Pressure Rate,0.004318256012187602
-MA1- Atmospheric Pressure Observation- Altimeter Setting Rate,0.0041151293119083025
-TMP- Air Temperature Observation- Air Temperature,0.0012242010954332766
-DEW- Air Temperature Observation- Dew Point Temperature,0.0010809242264862707
-CIG- Sky Condition Observation- Ceiling Height Dimension,0.0
-WND- Wind Observation- Direction Angle,0.0
+CIG_ceiling_height,0.14921089691456732
+TMP_air_temperature,0.13426474606580252
+SLP_sea_level_pressure,0.13282575058166138
+WND_speed_rate,0.12437124790011754
+DEW_dew_point,0.07941638223600496
+VIS_distance,0.07425055013282414
+WND_direction_angle,0.0

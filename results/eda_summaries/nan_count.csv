@@ -1,38 +1,28 @@
 ,0
 STATION,0
-STATION_LAT,0
-STATION_LON,0
+LATITUDE,0
+LONGITUDE,0
 ELEVATION,0
-STATION_DATE_TIME,0
-CIG- Sky Condition Observation- Ceiling Height Dimension,151808
-CIG- Sky Condition Observation- Ceiling Quality Code,5148
-CIG- Sky Condition Observation- Ceiling Determination Code,1113449
-CIG- Sky Condition Observation- Cavok Code,112314
-DEW- Air Temperature Observation- Dew Point Temperature,125666
-DEW- Air Temperature Observation- Dew Point Quality Code,17718
-MA1- Atmospheric Pressure Observation- Altimeter Setting Rate,174511
-MA1- Atmospheric Pressure Observation- Altimeter Quality Code,116930
-MA1- Atmospheric Pressure Observation- Station Pressure Rate,467782
-MA1- Atmospheric Pressure Observation- Station Pressure Quality Code,116930
-SLP- Atmospheric Pressure Observation- Sea Level Pressure,842051
-SLP- Atmospheric Pressure Observation- Sea Level Pressure Quality Code,0
-TMP- Air Temperature Observation- Air Temperature,117686
-TMP- Air Temperature Observation- Air Temperature Quality Code,17720
-VIS- Visibility Observation- Distance Dimension,118582
-VIS- Visibility Observation- Distance Quality Code,1779
-VIS- Visibility Observation- Variability Code,154665
-VIS- Visibility Observation- Quality Variability Code,0
-WND- Wind Observation- Direction Angle,220726
-WND- Wind Observation- Direction Quality Code,0
-WND- Wind Observation- Type Code,0
-WND- Wind Observation- Speed Rate,118588
-WND- Wind Observation- Speed Quality Code,0
-TORNADO_BEGIN_DATE_TIME,1304869
-TORNADO_END_DATE_TIME,1304869
-TORNADO_BEGIN_LAT,1306041
-TORNADO_BEGIN_LON,1306041
-TORNADO_END_LAT,1306041
-TORNADO_END_LON,1306041
-TORNADO_INITIAL_DISTANCE_FROM_STATION,1306041
-TORNADO_INITIAL_DISTANCE_FROM_STATION_WITHIN_50_km,1306041
+DATE,0
+WND_direction_angle,118444
+WND_direction_quality_code,10003
+WND_type_code,104519
+WND_speed_rate,104967
+WND_speed_quality_code,10653
+CIG_ceiling_height,131675
+CIG_ceiling_quality_code,132114
+CIG_ceiling_determination_code,988567
+CIG_cavok_code,99353
+VIS_distance,104965
+VIS_distance_quality_code,10335
+VIS_variability_code,135648
+VIS_variability_quality_code,35578
+TMP_air_temperature,104091
+TMP_air_temperature_quality_code,12499
+DEW_dew_point,110071
+DEW_dew_point_quality_code,12595
+SLP_sea_level_pressure,702124
+SLP_sea_level_pressure_quality_code,703171
 TORNADO_OCCURRENCE,0
+TORNADO_BEGIN_DATE_TIME,1368364
+WND_direction_angle_variable_wind_direction_flag,0

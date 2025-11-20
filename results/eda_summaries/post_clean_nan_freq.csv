@@ -1,25 +1,18 @@
 ,0
 STATION,0.0
-STATION_LAT,0.0
-STATION_LON,0.0
+LATITUDE,0.0
+LONGITUDE,0.0
 ELEVATION,0.0
-STATION_DATE_TIME,0.0
-CIG- Sky Condition Observation- Ceiling Height Dimension,0.0
-DEW- Air Temperature Observation- Dew Point Temperature,0.0
-MA1- Atmospheric Pressure Observation- Altimeter Setting Rate,0.0
-MA1- Atmospheric Pressure Observation- Station Pressure Rate,0.0
-SLP- Atmospheric Pressure Observation- Sea Level Pressure,0.0
-TMP- Air Temperature Observation- Air Temperature,0.0
-VIS- Visibility Observation- Distance Dimension,0.0
-WND- Wind Observation- Direction Angle,0.03978744241720773
-WND- Wind Observation- Type Code,0.0
-WND- Wind Observation- Speed Rate,0.0
-TORNADO_BEGIN_DATE_TIME,0.7996209510682288
-TORNADO_END_DATE_TIME,0.7996209510682288
-TORNADO_BEGIN_LAT,0.7996572236932786
-TORNADO_BEGIN_LON,0.7996572236932786
-TORNADO_END_LAT,0.7996572236932786
-TORNADO_END_LON,0.7996572236932786
-TORNADO_INITIAL_DISTANCE_FROM_STATION,0.7996572236932786
-TORNADO_INITIAL_DISTANCE_FROM_STATION_WITHIN_50_km,0.7996572236932786
+DATE,0.0
+WND_direction_angle,0.01627520061052213
+WND_type_code,0.0
+WND_speed_rate,0.0
+CIG_ceiling_height,0.0
+CIG_cavok_code,0.0
+VIS_distance,0.0
+VIS_variability_code,0.0
+TMP_air_temperature,0.0
+DEW_dew_point,0.0
+SLP_sea_level_pressure,0.0
 TORNADO_OCCURRENCE,0.0
+WND_direction_angle_variable_wind_direction_flag,0.0
