@@ -1,4 +1,4 @@
-STATION,LATITUDE,LONGITUDE,ELEVATION,DATE,WND_direction_angle,WND_direction_quality_code,WND_type_code,WND_speed_rate,WND_speed_quality_code,CIG_ceiling_height,CIG_ceiling_quality_code,CIG_ceiling_determination_code,CIG_cavok_code,VIS_distance,VIS_distance_quality_code,VIS_variability_code,VIS_variability_quality_code,TMP_air_temperature,TMP_air_temperature_quality_code,DEW_dew_point,DEW_dew_point_quality_code,SLP_sea_level_pressure,SLP_sea_level_pressure_quality_code,TORNADO_OCCURRENCE,TORNADO_BEGIN_TIME
+STATION,LATITUDE,LONGITUDE,ELEVATION,DATE,WND_direction_angle,WND_direction_quality_code,WND_type_code,WND_speed_rate,WND_speed_quality_code,CIG_ceiling_height,CIG_ceiling_quality_code,CIG_ceiling_determination_code,CIG_cavok_code,VIS_distance,VIS_distance_quality_code,VIS_variability_code,VIS_variability_quality_code,TMP_air_temperature,TMP_air_temperature_quality_code,DEW_dew_point,DEW_dew_point_quality_code,SLP_sea_level_pressure,SLP_sea_level_pressure_quality_code,TORNADO_OCCURRENCE,TORNADO_BEGIN_DATE_TIME
 99999903954,35.534,-97.647,396.0,2000-01-01 05:59:00,999,9,9,9999,9,99999,9,9,9,999999,9,9,9,9999,9,9999,9,99999,9,False,
 99999903954,35.534,-97.647,396.0,2000-01-01 05:59:00,999,9,9,9999,9,99999,9,9,9,999999,9,9,9,9999,9,9999,9,99999,9,False,
 99999903954,35.534,-97.647,396.0,2000-01-02 05:59:00,999,9,9,9999,9,99999,9,9,9,999999,9,9,9,9999,9,9999,9,99999,9,False,
@@ -4818,7 +4818,7 @@ STATION,LATITUDE,LONGITUDE,ELEVATION,DATE,WND_direction_angle,WND_direction_qual
 99999903954,35.534,-97.647,396.0,2005-04-10 14:18:00,160,5,N,103,5,640,5,M,N,16093,5,N,5,170,5,130,5,99999,9,False,
 99999903954,35.534,-97.647,396.0,2005-04-10 14:53:00,170,5,N,88,5,701,5,M,N,16093,5,N,5,172,5,133,5,10027,5,False,
 99999903954,35.534,-97.647,396.0,2005-04-10 15:53:00,160,5,N,103,5,762,5,M,N,16093,5,N,5,178,5,133,5,10032,5,False,
-99999903954,35.534,-97.647,396.0,2005-04-10 16:53:00,160,5,N,72,5,701,5,M,N,16093,5,N,5,178,5,139,5,10035,5,False,
+99999903954,35.534,-97.647,396.0,2005-04-10 16:53:00,160,5,N,72,5,701,5,M,N,16093,5,N,5,178,5,139,5,10035,5,True,2005-04-10 19:30:00
 99999903954,35.534,-97.647,396.0,2005-04-10 17:30:00,160,5,N,77,5,366,5,M,N,14484,5,N,5,170,5,150,5,99999,9,True,2005-04-10 19:30:00
 99999903954,35.534,-97.647,396.0,2005-04-10 17:37:00,150,5,N,77,5,427,5,M,N,4023,5,N,5,170,5,150,5,99999,9,True,2005-04-10 19:30:00
 99999903954,35.534,-97.647,396.0,2005-04-10 17:41:00,160,5,N,77,5,427,5,M,N,12875,5,N,5,170,5,150,5,99999,9,True,2005-04-10 19:30:00
