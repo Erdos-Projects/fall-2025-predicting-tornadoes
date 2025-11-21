@@ -129,7 +129,7 @@ def process_station_data(path_to_interim_folder, field_parsing_map=isd_field_par
     print(f'Found {local_path_to_folder}')
     
     interim_station_csv_files = [file for file in interim_station_files if file.endswith('.csv')]
-    local_processed_station_path = project_root / pathlib.Path('Data/stations/processed')
+    local_processed_station_path = project_root / pathlib.Path('data/stations/processed')
     
     # Create output directory if it doesn't exist
     local_processed_station_path.mkdir(parents=True, exist_ok=True)
@@ -157,4 +157,4 @@ def process_station_data(path_to_interim_folder, field_parsing_map=isd_field_par
     return None
 
 
-process_station_data('Data/stations/interim')
+process_station_data('data/stations/interim')

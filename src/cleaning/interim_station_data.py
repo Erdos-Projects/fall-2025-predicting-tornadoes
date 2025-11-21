@@ -100,7 +100,7 @@ features_to_drop_before_eda = [
 ]
 
 # Drop columns for each station.
-# Put each Data/interim/stations/interim if they are not too large
+# Put each data/interim/stations/interim if they are not too large
 
 def interim_station_data(path_to_raw_folder, features_to_drop_before_eda = features_to_drop_before_eda):
     project_root = ppath.find_project_root()
@@ -121,7 +121,7 @@ def interim_station_data(path_to_raw_folder, features_to_drop_before_eda = featu
         station_df_cols = station_df.columns
         station_cols_to_drop = [col for col in features_to_drop_before_eda if (col in station_df_cols)]
         new_station_df=station_df.drop(columns=station_cols_to_drop)
-        new_station_file = pathlib.Path(f'Data/stations/interim/INTERIM_{station_csv}')
+        new_station_file = pathlib.Path(f'data/stations/interim/INTERIM_{station_csv}')
         path_to_new_file = project_root/new_station_file
         new_station_df.to_csv(path_to_new_file, index=False)
         file_size_bytes = path_to_new_file.stat().st_size
@@ -131,5 +131,5 @@ def interim_station_data(path_to_raw_folder, features_to_drop_before_eda = featu
     return print(total_size_mb)
 
 # Run interim_station_data
-interim_station_data('Data/stations/raw')
+interim_station_data('data/stations/raw')
 

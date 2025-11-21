@@ -5,9 +5,9 @@ import os
 # Step 1: Filter Tornadoes that occurred in Oklahoma for each year
 # Put each filtered data frame for each year in the list df_collect
 
-raw_path = 'Data/events/raw'
-interim_out_path = 'Data/events/interim/Oklahoma_Tornadoes_2000_2021.csv' # Path to interim CSV (optional)
-processed_out_path = 'Data/events/processed/final_Oklahoma_Tornadoes_2000_2021.csv' # Path to processed csv
+raw_path = 'data/events/raw'
+interim_out_path = 'data/events/interim/Oklahoma_Tornadoes_2000_2021.csv' # Path to interim CSV (optional)
+processed_out_path = 'data/events/processed/final_Oklahoma_Tornadoes_2000_2021.csv' # Path to processed csv
 df_collect = [] # collect DataFrames here
 
 for year in range(2000, 2022):

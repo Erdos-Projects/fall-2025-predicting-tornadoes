@@ -84,17 +84,17 @@ def tornado_station_matcher(df_station,
                                   ):
     
     # Ensure datetime columns are proper datetime type
-    if not pd.api.types.is_datetime64_any_dtype(df_station[station_datetime_column]):
-        df_station[station_datetime_column] = pd.to_datetime(df_station[station_datetime_column])
-    if not pd.api.types.is_datetime64_any_dtype(df_events[begin_event_datetime_column]):
-        df_events[begin_event_datetime_column] = pd.to_datetime(df_events[begin_event_datetime_column])
-    if not pd.api.types.is_datetime64_any_dtype(df_events[end_event_datetime_column]):
-        df_events[end_event_datetime_column] = pd.to_datetime(df_events[end_event_datetime_column])
+    
+    df_station[station_datetime_column] = pd.to_datetime(df_station[station_datetime_column],errors='coerce')
+    
+    df_events[begin_event_datetime_column] = pd.to_datetime(df_events[begin_event_datetime_column],errors='coerce')
+
+    df_events[end_event_datetime_column] = pd.to_datetime(df_events[end_event_datetime_column],errors='coerce')
     
     # Create 'TORNADO_OCCURRENCE' columns initial values of false
     df_station['TORNADO_OCCURRENCE'] = False
     # Create 'TORNADO_BEGIN_TIME' columns initial values of np.nan
-    df_station['TORNADO_BEGIN_TIME'] = pd.NaT
+    df_station[begin_event_datetime_column] = pd.NaT
     
     # Important for lat_lon_metric
     df_events = df_events.dropna(subset=['TORNADO_BEGIN_LAT', 'TORNADO_BEGIN_LON'])
@@ -121,10 +121,10 @@ def tornado_station_matcher(df_station,
         distance_mask = station_tornado_distances <= val_radius
         
         df_station.loc[(time_window_mask)&(distance_mask),'TORNADO_OCCURRENCE']=True
-        df_station.loc[(time_window_mask)&(distance_mask),'TORNADO_BEGIN_TIME']= tornado_begin_time
+        df_station.loc[(time_window_mask)&(distance_mask),begin_event_datetime_column]= tornado_begin_time
     
     # check that time_window is respected
-    assert(((df_station['TORNADO_BEGIN_TIME']-df_station['DATE']).dt.total_seconds() / 3600).max()<= time_window )
+    assert(((df_station[begin_event_datetime_column]-df_station[station_datetime_column]).dt.total_seconds() / 3600).max()<= time_window )
     return df_station
 
 ### HYPERPARAMETER time_window in hours
@@ -148,8 +148,8 @@ def tornado_station_matcher(df_station,
 # create_tornado_indicator function below
 
 def create_tornado_indicator(
-    processed_event_path:str = 'Data/events/processed/final_Oklahoma_Tornadoes_2000_2021.csv',
-    processed_station_directory:str='Data/stations/processed',
+    processed_event_path:str = 'data/events/processed/final_Oklahoma_Tornadoes_2000_2021.csv',
+    processed_station_directory:str='data/stations/processed',
     time_window:float = 2,
     val_radius = 75):
     f""" Creates a tornado indicator column in the station-events merged DataFrame.
@@ -176,7 +176,7 @@ def create_tornado_indicator(
     processed_station_csv_files = [file for file in processed_station_files if file.endswith('.csv')]
     
     # Create output directory if it doesn't exist
-    local_event_station_indicator_path = project_root / pathlib.Path('Data/event_station_indicator/')
+    local_event_station_indicator_path = project_root / pathlib.Path('data/event_station_indicator/')
     local_event_station_indicator_path.mkdir(parents=True, exist_ok=True)
     
     
@@ -189,6 +189,7 @@ def create_tornado_indicator(
 
     
     for station_csv in processed_station_csv_files:
+        
         station_csv_path = local_path_to_folder/pathlib.Path(station_csv)
         df_station = pd.read_csv(station_csv_path)
         df_tornado_indicator= tornado_station_matcher(df_station=df_station,
@@ -196,14 +197,22 @@ def create_tornado_indicator(
                                 time_window=time_window,
                                 val_radius=val_radius)
         file_name = station_csv.replace('PROCESSED','TOR_INDICATOR')
+            
+        # Ensure datetime columns are proper datetime type
+        #if not pd.api.types.is_datetime64_any_dtype(df_station['DATE']):
+        df_tornado_indicator['DATE'] = pd.to_datetime(df_tornado_indicator['DATE'])
+        #if not pd.api.types.is_datetime64_any_dtype(df_events['TORNADO_BEGIN_DATE_TIME']):
+        df_tornado_indicator['TORNADO_BEGIN_DATE_TIME'] = pd.to_datetime(df_tornado_indicator['TORNADO_BEGIN_DATE_TIME'])
+            
+        # Save 
         df_tornado_indicator.to_csv(project_root/local_event_station_indicator_path/pathlib.Path(file_name),index=False)
-    
+
     return None
 
 
 
 create_tornado_indicator(
-    processed_event_path= 'Data/events/processed/final_Oklahoma_Tornadoes_2000_2021.csv',
-    processed_station_directory='Data/stations/processed',
-    time_window = 2,
+    processed_event_path= 'data/events/processed/final_Oklahoma_Tornadoes_2000_2021.csv',
+    processed_station_directory='data/stations/processed',
+    time_window = 3,
     val_radius = 75)
