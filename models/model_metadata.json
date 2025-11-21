@@ -1,0 +1,39 @@
+{
+  "model_type": "RandomForestClassifier",
+  "training_data": {
+    "start_date": "2000-01-01",
+    "end_date": "2019-12-31",
+    "n_samples": 563033,
+    "n_features": 16,
+    "tornado_rate": 0.0015469785962812126
+  },
+  "hyperparameters": {
+    "max_depth": 10,
+    "max_features": "sqrt",
+    "max_samples": 0.3,
+    "min_samples_leaf": 20,
+    "min_samples_split": 50,
+    "n_estimators": 100,
+    "class_weight": "balanced",
+    "random_state": 42
+  },
+  "decision_threshold": 0.04591873420428021,
+  "threshold_tuning": {
+    "tuned_on": "training set (2000-2019)",
+    "metric": "Best F2 score",
+    "best_train_f2": 0.40956682406076783
+  },
+  "feature_engineering": [
+    "HourlyRates (DEW, TMP, SLP)",
+    "DatetimeSinCosConverter (month, hour)",
+    "Dropped: [CIG_cavok_code",
+    "VIS_variability_code",
+    "WND_type_code",
+    "WND_direction_angle_variable_wind_direction_flag"
+  ],
+  "preprocessing": "TC_HR_preprocessor",
+  "calibration": {
+    "method": "isotonic",
+    "cv": "YearlyTemporalWindowSplit(end_year=2019, start_year=2002, val_window_size=2)"
+  }
+}
