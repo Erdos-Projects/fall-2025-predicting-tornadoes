@@ -17,7 +17,7 @@
 
 ### A Brief Overview
 
-Oklahoma City (OKC) is in the heart of tornado ally and known for its frequency and strength of tornadoes. This project uses a scikit-learn RandomForestClassifier ro predict tornado occurrence in (OKC) given current meteorological conditions with **only** surface data obtained from local weather stations (**no radar data**) . This work demonstrates:
+Oklahoma City (OKC) is in the heart of tornado ally and known for its frequency and strength of tornadoes. This project uses a scikit-learn RandomForestClassifier to predict tornado occurrence in (OKC) given current meteorological conditions with **only** surface data obtained from local weather stations (**no radar data**) . This work demonstrates:
 
 - Rigorous temporal cross-validation to prevent data leakage
 - Feature engineering incorporating meteorological domain knowledge
