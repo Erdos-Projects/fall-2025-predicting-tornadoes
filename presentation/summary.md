@@ -1,6 +1,6 @@
 # Executive Summary Document
 
-##A Brief Overview
+## A Brief Overview
 
 Oklahoma City (OKC) is in the heart of tornado ally and known for its frequency and strength of tornadoes. This project uses a scikit-learn RandomForestClassifier to predict tornado occurrence in (OKC) given current meteorological conditions with **only** surface data obtained from local weather stations (**no radar data**) . This work demonstrates:
 
@@ -102,7 +102,7 @@ Oklahoma City (OKC) is in the heart of tornado ally and known for its frequency 
 
 1. **Investigate Temporal Distribution Shift Through Ensemble Methods:**
 
-The significant validation→test performance drop  reveals temporal non-stationarity in tornado formation patterns. Future work should explore ensemble approaches that combine models trained on different **seasonal** periods to create more robust predictions across distributional shifts. In addition, we should also take into account the **time of day** in dealing with temporal distribution-- we saw in our EDA that Tornadoes are more common in early afternoon, but this need not always be the case.
+The significant validation to test performance drop  reveals temporal non-stationarity in tornado formation patterns. Future work should explore ensemble approaches that combine models trained on different **seasonal** periods to create more robust predictions across distributional shifts. In addition, we should also take into account the **time of day** in dealing with temporal distribution-- we saw in our EDA that Tornadoes are more common in early afternoon, but this need not always be the case.
 
 2. **Incorporate Radar and Satellite Data**
 
