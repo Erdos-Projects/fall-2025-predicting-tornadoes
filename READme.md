@@ -156,7 +156,7 @@ predictions = (probabilities >= threshold).astype(int)
 - **EDA notebook:** ~5 minutes
 - **Baseline modeling:** ~10-15 minutes
 - **Feature engineering:** ~15-20 minutes
-- **Final results (with GridSearchCV):** ~8~10 hours ( I don't reccomend running the second grid search- see [second grid search](results/cv_parameter_search/random_forest/second_grid_search_results.csv) instead)
+- **Final results (with GridSearchCV):** approximately 10 hours ( I don't reccomend running the second grid search- see [second grid search](results/cv_parameter_search/random_forest/second_grid_search_results.csv) instead)
 
 **Note:** All GridSearchCV's in `final_results.ipynb` are computationally intensive- especially the second. Results are already saved in `results/final_model/`
 
