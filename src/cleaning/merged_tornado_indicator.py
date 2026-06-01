@@ -120,7 +120,7 @@ def tornado_station_matcher(df_station,
                                                     lon_2=tornado_begin_lon)
         distance_mask = station_tornado_distances <= val_radius
         
-        df_station.loc[(time_window_mask)&(distance_mask),'TORNADO_OCCURRENCE']=True
+        df_station.loc[(time_window_mask)&(distance_mask),'TORNADO_OCCURRENCE']=True # Inital label is false
         df_station.loc[(time_window_mask)&(distance_mask),begin_event_datetime_column]= tornado_begin_time
     
     # check that time_window is respected
